@@ -1,6 +1,7 @@
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -11,7 +12,6 @@ public class Echo {
     private static final String SEPARATOR = "────────────────────────────────────────────────────────────────";
     private static final String PROMPT = "echo ❯ ";
     private static final String PREFIX = "  [ECHO] ";
-
     private static final String BANNER = """
        ______ _____ _   _  ____  \s
       |  ____/ ____| | | |/ __ \\ \s
@@ -33,10 +33,12 @@ public class Echo {
     private static int messageCount = 0;
     private static final Instant SESSION_START = Instant.now();
 
+    private static final String[] messages = new String[100];
+
     public static void main(String[] args) {
         System.out.println(BANNER);
-        printBotResponse("Signal established. Online and listening!\n"
-                + "Type 'bye' to disconnect.");
+
+        printBotResponse("Signal established. Online and listening!\nType 'bye' to disconnect.");
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
@@ -52,15 +54,25 @@ public class Echo {
                     continue;
                 }
 
-                if (input.equalsIgnoreCase("bye")) {
-                    String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
-                    printBotResponse(farewell + "\n" + sessionSummary());
-                    break;
+                switch (input.toLowerCase(Locale.ROOT)) {
+                    case "list":
+                        String response = "";
+                        for (int i = 0; i < messageCount; i++) {
+                            response += i + 1 + ": " + messages[i] + "\n";
+                        }
+                        printBotResponse(response);
+                        break;
+
+                    case "bye":
+                        String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
+                        printBotResponse(farewell + "\n" + sessionSummary());
+                        return;
+
+                    default:
+                        messages[messageCount++] = input;
+                        printBotResponse("Added: " + input);
+                        break;
                 }
-
-                messageCount++;
-
-                printBotResponse(input);
             }
         }
     }
