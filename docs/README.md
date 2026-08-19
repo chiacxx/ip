@@ -1,4 +1,6 @@
-# Duke User Guide
+# E.C.H.O. User Guide
+
+E.C.H.O. stands for _Everyday Conversational and Helpful Operator_.
 
 // Update the title above to match the actual product name
 
