@@ -1,5 +1,3 @@
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -10,8 +8,8 @@ import java.util.Scanner;
  */
 public class Echo {
     private static final String SEPARATOR = "────────────────────────────────────────────────────────────────";
-    private static final String PROMPT = "echo ❯ ";
     private static final String PREFIX = "  [ECHO] ";
+
     private static final String BANNER = """
        ______ _____ _   _  ____  \s
       |  ____/ ____| | | |/ __ \\ \s
@@ -30,10 +28,9 @@ public class Echo {
     );
 
     private static final Random RANDOM = new Random();
-    private static int messageCount = 0;
-    private static final Instant SESSION_START = Instant.now();
 
-    private static final String[] messages = new String[100];
+    private static int taskCount = 0;
+    private static final Task[] tasks = new Task[100];
 
     public static void main(String[] args) {
         System.out.println(BANNER);
@@ -42,7 +39,7 @@ public class Echo {
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
-                System.out.print(PROMPT);
+                System.out.print("echo ❯ ");
 
                 if (!scanner.hasNextLine()) {
                     break;
@@ -54,22 +51,36 @@ public class Echo {
                     continue;
                 }
 
-                switch (input.toLowerCase(Locale.ROOT)) {
+                String[] commandParts = input.split("\\s+");
+                String command = commandParts[0].toLowerCase(Locale.ROOT);
+
+                switch (command) {
                     case "list":
-                        String response = "";
-                        for (int i = 0; i < messageCount; i++) {
-                            response += i + 1 + ": " + messages[i] + "\n";
+                        StringBuilder response = new StringBuilder("Your tasks:\n");
+                        for (int i = 0; i < taskCount; i++) {
+                            response.append(i + 1)
+                                    .append(": ")
+                                    .append(tasks[i])
+                                    .append("\n");
                         }
-                        printBotResponse(response);
+                        printBotResponse(response.toString().stripTrailing());
+                        break;
+
+                    case "mark":
+                        updateTaskStatus(commandParts, true);
+                        break;
+
+                    case "unmark":
+                        updateTaskStatus(commandParts, false);
                         break;
 
                     case "bye":
                         String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
-                        printBotResponse(farewell + "\n" + sessionSummary());
+                        printBotResponse(farewell);
                         return;
 
                     default:
-                        messages[messageCount++] = input;
+                        tasks[taskCount++] = new Task(input);
                         printBotResponse("Added: " + input);
                         break;
                 }
@@ -77,16 +88,41 @@ public class Echo {
         }
     }
 
-    private static String sessionSummary() {
-        Duration uptime = Duration.between(SESSION_START, Instant.now());
-        return "Session stats -> messages: " + messageCount
-                + ", uptime: " + formatDuration(uptime);
-    }
+    /**
+     * Marks or unmarks the task identified by a one-based command-line index.
+     *
+     * @param commandParts the command and its arguments
+     * @param done whether the task should be marked done
+     */
+    private static void updateTaskStatus(String[] commandParts, boolean done) {
+        if (commandParts.length != 2) {
+            printBotResponse("Please provide a task number.");
+            return;
+        }
 
-    private static String formatDuration(Duration d) {
-        long minutes = d.toMinutes();
-        long seconds = d.minusMinutes(minutes).getSeconds();
-        return minutes + "m " + seconds + "s";
+        int taskNumber;
+
+        try {
+            taskNumber = Integer.parseInt(commandParts[1]);
+        } catch (NumberFormatException exception) {
+            printBotResponse("Please provide a valid task number.");
+            return;
+        }
+
+        if (taskNumber < 1 || taskNumber > taskCount) {
+            printBotResponse("There is no task with that number.");
+            return;
+        }
+
+        Task task = tasks[taskNumber - 1];
+
+        if (done) {
+            task.mark();
+            printBotResponse("Task marked successfully:\n  " + task);
+        } else {
+            task.unmark();
+            printBotResponse("Task unmarked successfully:\n  " + task);
+        }
     }
 
     /**
@@ -97,7 +133,6 @@ public class Echo {
     private static void printBotResponse(String message) {
         System.out.println(SEPARATOR);
 
-        // Indents multi-line output cleanly under the ECHO tag
         String formatted = message.replace("\n", "\n" + " ".repeat(PREFIX.length()));
         System.out.println(PREFIX + formatted);
 
