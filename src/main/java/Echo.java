@@ -1,32 +1,94 @@
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
- * Entry point for the E.C.H.O. chatbot.
- * E.C.H.O. stands for Everyday Conversational and Helpful Operator.
+ * E.C.H.O. - Everyday Conversational & Helpful Operator.
  */
 public class Echo {
-    /** Separates user commands and E.C.H.O.'s responses in the console. */
-    private static final String SEPARATOR = "____________________________________________________________";
+    private static final String SEPARATOR = "────────────────────────────────────────────────────────────────";
+    private static final String PROMPT = "echo ❯ ";
+    private static final String PREFIX = "  [ECHO] ";
+
     private static final String BANNER = """
-       ______ _____ _   _  ____  
-      |  ____/ ____| | | |/ __ \\ 
+       ______ _____ _   _  ____  \s
+      |  ____/ ____| | | |/ __ \\ \s
       | |__ | |    | |_| | |  | |
       |  __|| |    |  _  | |  | |
       | |___| |____| | | | |__| |
-      |______\\_____|_| |_|\\____/ 
-      [E]veryday [C]onversational & [H]elpful [O]perator
-      """;
+      |______\\_____|_| |_|\\____/ \s
+      + ──────────────────────────────────────────────────────────── +
+      |  [E]veryday [C]onversational & [H]elpful [O]perator
+      + ──────────────────────────────────────────────────────────── +""";
 
-    /** Starts E.C.H.O. and processes commands until the user enters {@code bye}. */
+    private static final List<String> FAREWELL_FLAVORS = List.of(
+            "Signal fading... E.C.H.O. signing off. Take care!",
+            "Powering down the transmitter. Catch you soon!",
+            "Going dark now. Thanks for the chat!"
+    );
+
+    private static final Random RANDOM = new Random();
+    private static int messageCount = 0;
+    private static final Instant SESSION_START = Instant.now();
+
     public static void main(String[] args) {
-        // Display the banner
         System.out.println(BANNER);
-        System.out.println("Greetings! How can I assist you today?");
+        printBotResponse("Signal established. Online and listening!\n"
+                + "Type 'bye' to disconnect.");
 
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (true) {
+                System.out.print(PROMPT);
+
+                if (!scanner.hasNextLine()) {
+                    break;
+                }
+
+                String input = scanner.nextLine().trim();
+
+                if (input.isEmpty()) {
+                    continue;
+                }
+
+                if (input.equalsIgnoreCase("bye")) {
+                    String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
+                    printBotResponse(farewell + "\n" + sessionSummary());
+                    break;
+                }
+
+                messageCount++;
+
+                printBotResponse(input);
+            }
+        }
+    }
+
+    private static String sessionSummary() {
+        Duration uptime = Duration.between(SESSION_START, Instant.now());
+        return "Session stats -> messages: " + messageCount
+                + ", uptime: " + formatDuration(uptime);
+    }
+
+    private static String formatDuration(Duration d) {
+        long minutes = d.toMinutes();
+        long seconds = d.minusMinutes(minutes).getSeconds();
+        return minutes + "m " + seconds + "s";
+    }
+
+    /**
+     * Formats and prints a multi-line message wrapped inside clean divider rails.
+     *
+     * @param message Message to display to the user.
+     */
+    private static void printBotResponse(String message) {
         System.out.println(SEPARATOR);
 
-        System.out.println("E.C.H.O. signing off. Have a productive day!");
+        // Indents multi-line output cleanly under the ECHO tag
+        String formatted = message.replace("\n", "\n" + " ".repeat(PREFIX.length()));
+        System.out.println(PREFIX + formatted);
 
-        System.out.println(SEPARATOR);
+        System.out.println(SEPARATOR + "\n");
     }
 }
