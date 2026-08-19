@@ -3,9 +3,9 @@
  */
 public class Task {
     /** Text entered by the user to describe the task. */
-    protected String description;
+    private final String description;
     /** Whether the task has been completed. */
-    protected boolean isDone;
+    private boolean isDone;
 
     /**
      * Creates a new task that is initially not done.
