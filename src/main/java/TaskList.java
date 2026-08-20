@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Stores tasks in insertion order and provides the one-based lookup used by commands.
+ * Stores tasks in insertion order and provides one-based lookup.
  */
 public class TaskList {
     /** The tasks currently in the user's list. */

@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -7,8 +6,23 @@ import java.util.Scanner;
  * E.C.H.O. - Everyday Conversational & Helpful Operator.
  */
 public class Echo {
-    private static final String SEPARATOR = "────────────────────────────────────────────────────────────────";
-    private static final String PREFIX = "  [ECHO] ";
+    private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
+    private static final String PROMPT = "E.C.H.O. ❯ ";
+    private static final String RESPONSE_INDENT = "  ";
+    private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
+
+    private static final String HELP_MESSAGE = """
+            Available operations:
+              help                                         Show this help message
+              list                                         Display all tasks
+              todo <description>                           Add a todo task
+              deadline <description> /by <deadline>        Add a deadline task
+              event <description> /from <start> /to <end>  Add an event task
+              mark <number>                                Mark a task as done
+              unmark <number>                              Mark a task as not done
+              bye                                          Disconnect from E.C.H.O.
+
+            Task numbers are shown by the 'list' command.""";
 
     private static final String BANNER = """
        ______ _____ _   _  ____  \s
@@ -17,9 +31,7 @@ public class Echo {
       |  __|| |    |  _  | |  | |
       | |___| |____| | | | |__| |
       |______\\_____|_| |_|\\____/ \s
-      + ──────────────────────────────────────────────────────────── +
-      |  [E]veryday [C]onversational & [H]elpful [O]perator
-      + ──────────────────────────────────────────────────────────── +""";
+      """;
 
     private static final List<String> FAREWELL_FLAVORS = List.of(
             "Signal fading... E.C.H.O. signing off. Take care!",
@@ -29,17 +41,28 @@ public class Echo {
 
     private static final Random RANDOM = new Random();
 
-    /** Stores tasks independently from the command-line user interface. */
-    private static final TaskList taskList = new TaskList();
+    private final CommandParser commandParser;
+    private final TaskManager taskManager;
 
+    /** Creates a new E.C.H.O. session with an empty task list. */
+    public Echo() {
+        this.commandParser = new CommandParser();
+        this.taskManager = new TaskManager();
+    }
+
+    /** Main driver to start an Echo session. */
     public static void main(String[] args) {
-        System.out.println(BANNER);
+        new Echo().run();
+    }
 
-        printBotResponse("Signal established. Online and listening!\nType 'bye' to disconnect.");
+    /** Reads and processes inputs until the user disconnects or input ends. */
+    private void run() {
+        System.out.println(BANNER);
+        printBotResponse("Signal established. Online and listening!\nType 'help' to view list of operations!");
 
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
-                System.out.print("echo ❯ ");
+                System.out.print(PROMPT);
 
                 if (!scanner.hasNextLine()) {
                     break;
@@ -51,173 +74,155 @@ public class Echo {
                     continue;
                 }
 
-                String[] commandParts = input.split("\\s+");
-                String command = commandParts[0].toLowerCase(Locale.ROOT);
-
-                switch (command) {
-                    case "list":
-                        handleList();
+                try {
+                    if (execute(commandParser.parse(input))) {
                         break;
-
-                    case "todo":
-                        handleTodo(input);
-                        break;
-
-                    case "deadline":
-                        handleDeadline(input);
-                        break;
-
-                    case "event":
-                        handleEvent(input);
-                        break;
-
-                    case "mark":
-                        updateTaskStatus(commandParts, true);
-                        break;
-
-                    case "unmark":
-                        updateTaskStatus(commandParts, false);
-                        break;
-
-                    case "bye":
-                        handleBye();
-                        return;
-
-                    default:
-                        printBotResponse("Invalid command!");
-                        break;
+                    }
+                } catch (EchoException exception) {
+                    printBotResponse(exception.getMessage());
                 }
             }
         }
     }
 
+    /**
+     * Executes a validated command.
+     *
+     * @param command Validated command
+     * @return Whether the session should end
+     * @throws EchoException if the command refers to a task that does not exist
+     */
+    private boolean execute(Command command) throws EchoException {
+        switch (command.getType()) {
+            case HELP:
+                handleHelp();
+                return false;
+            case LIST:
+                handleList();
+                return false;
+            case TODO:
+                announceAdded(taskManager.addTodo(command.getArgument(0)));
+                return false;
+            case DEADLINE:
+                announceAdded(taskManager.addDeadline(command.getArgument(0), command.getArgument(1)));
+                return false;
+            case EVENT:
+                announceAdded(taskManager.addEvent(command.getArgument(0), command.getArgument(1),
+                        command.getArgument(2)));
+                return false;
+            case MARK:
+                announceStatus(taskManager.markTask(Integer.parseInt(command.getArgument(0))), true);
+                return false;
+            case UNMARK:
+                announceStatus(taskManager.unmarkTask(Integer.parseInt(command.getArgument(0))), false);
+                return false;
+            case BYE:
+                handleBye();
+                return true;
+            default:
+                throw new EchoException("I could not process that command. Try 'help' to see available commands.");
+        }
+    }
+
+    /** Displays the commands and formats supported by E.C.H.O. */
+    private void handleHelp() {
+        printBotResponse(HELP_MESSAGE);
+    }
+
     /** Displays every task in the order in which it was added. */
-    private static void handleList() {
-        if (taskList.isEmpty()) {
+    private void handleList() {
+        if (taskManager.isEmpty()) {
             printBotResponse("List is empty!");
             return;
         }
 
         StringBuilder response = new StringBuilder("Your tasks:\n");
-        for (int i = 1; i <= taskList.size(); i++) {
+        for (int i = 1; i <= taskManager.size(); i++) {
             response.append(i)
                     .append(": ")
-                    .append(taskList.getTask(i))
+                    .append(taskManager.getTask(i))
                     .append("\n");
         }
         printBotResponse(response.toString().stripTrailing());
     }
 
     /** Prints a random farewell before ending the session. */
-    private static void handleBye() {
+    private void handleBye() {
         String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
         printBotResponse(farewell);
     }
 
-    /** Creates and stores a todo task from the text following the command. */
-    private static void handleTodo(String input) {
-        String description = getCommandContent(input);
-
-        if (description.isEmpty()) {
-            printBotResponse("The description of a todo cannot be empty!");
-            return;
-        }
-
-        addTask(new ToDo(description));
+    /** Displays the task created by a successful add command. */
+    private void announceAdded(Task task) {
+        printBotResponse("Added the following task:\n  " + task
+                + "\nTotal tasks: " + taskManager.size());
     }
 
-    /** Creates and stores a deadline task after validating its {@code /by} field. */
-    private static void handleDeadline(String input) {
-        String content = getCommandContent(input);
-        String[] parts = content.split("(?i)\\s+/by\\s+", 2);
-
-        if (parts.length < 2 || parts[0].isBlank() || parts[1].isBlank()) {
-            printBotResponse("Please specify a description and a deadline using '/by <deadline>'");
-            return;
-        }
-
-        addTask(new Deadline(parts[0].trim(), parts[1].trim()));
-    }
-
-    /** Creates and stores an event task after validating its {@code /from} and {@code /to} fields. */
-    private static void handleEvent(String input) {
-        String content = getCommandContent(input);
-        String[] partsFrom = content.split("(?i)\\s+/from\\s+", 2);
-
-        if (partsFrom.length < 2 || partsFrom[0].isBlank()) {
-            printBotResponse("Please use format: event <desc> /from <start> /to <end>");
-            return;
-        }
-
-        String description = partsFrom[0].trim();
-        String[] partsTo = partsFrom[1].split("(?i)\\s+/to\\s+", 2);
-
-        if (partsTo.length < 2 || partsTo[0].isBlank() || partsTo[1].isBlank()) {
-            printBotResponse("Please use format: event <desc> /from <start> /to <end>");
-            return;
-        }
-
-        addTask(new Event(description, partsTo[0].trim(), partsTo[1].trim()));
-    }
-
-    /**
-     * Extracts the portion of an input line after its first whitespace-separated command.
-     *
-     * @param input complete input line from the user
-     * @return command arguments, or an empty string when no arguments were supplied
-     */
-    private static String getCommandContent(String input) {
-        for (int i = 0; i < input.length(); i++) {
-            if (Character.isWhitespace(input.charAt(i))) {
-                return input.substring(i + 1).trim();
-            }
-        }
-        return "";
-    }
-
-    /** Adds a task and reports the resulting task to the user. */
-    private static void addTask(Task task) {
-        taskList.addTask(task);
-        printBotResponse("Added the following task:\n  " + task + "\nTotal tasks: " + taskList.size());
-    }
-
-    /** Marks or unmarks a task using the one-based number shown by {@code list}. */
-    private static void updateTaskStatus(String[] commandParts, boolean done) {
-        if (commandParts.length != 2) {
-            printBotResponse("Please provide a task number.");
-            return;
-        }
-
-        int taskNumber;
-
-        try {
-            taskNumber = Integer.parseInt(commandParts[1]);
-        } catch (NumberFormatException exception) {
-            printBotResponse("Please provide a valid task number.");
-            return;
-        }
-
-        if (!taskList.hasTask(taskNumber)) {
-            printBotResponse("There is no task with that number.");
-            return;
-        }
-
-        Task task = taskList.getTask(taskNumber);
-
-        if (done) {
-            task.mark();
-            printBotResponse("Task marked successfully:\n  " + task);
-        } else {
-            task.unmark();
-            printBotResponse("Task unmarked successfully:\n  " + task);
-        }
+    /** Displays the result of marking or unmarking a task. */
+    private void announceStatus(Task task, boolean marked) {
+        String action = marked ? "marked" : "unmarked";
+        printBotResponse("Task " + action + " successfully:\n  " + task);
     }
 
     /** Prints a message using the standard E.C.H.O. response layout. */
-    private static void printBotResponse(String message) {
+    private void printBotResponse(String message) {
         System.out.println(SEPARATOR);
-        String formatted = message.replace("\n", "\n" + " ".repeat(PREFIX.length()));
-        System.out.println(PREFIX + formatted);
+        System.out.println(wrapResponse(message));
         System.out.println(SEPARATOR + "\n");
+    }
+
+    /** Wraps each response line so it fits within the separator width. */
+    private String wrapResponse(String message) {
+        String[] lines = message.split("\\R", -1);
+        StringBuilder wrapped = new StringBuilder();
+
+        for (int i = 0; i < lines.length; i++) {
+            if (i > 0) {
+                wrapped.append("\n");
+            }
+            appendWrappedLine(wrapped, lines[i]);
+        }
+
+        return wrapped.toString();
+    }
+
+    /** Appends one response line, breaking it at a word boundary when possible. */
+    private void appendWrappedLine(StringBuilder output, String line) {
+        if (line.isEmpty()) {
+            output.append(RESPONSE_INDENT);
+            return;
+        }
+
+        String remaining = line;
+        boolean firstSegment = true;
+
+        while (!remaining.isEmpty()) {
+            if (!firstSegment) {
+                output.append("\n");
+            }
+
+            int end = Math.min(RESPONSE_CONTENT_WIDTH, remaining.length());
+            int breakAt = end < remaining.length() ? findWordBreak(remaining, end) : end;
+
+            output.append(RESPONSE_INDENT).append(remaining, 0, breakAt);
+            remaining = remaining.substring(breakAt).stripLeading();
+            firstSegment = false;
+        }
+    }
+
+    /** Finds the last whitespace before the width limit, or uses a hard break. */
+    private int findWordBreak(String line, int end) {
+        int firstContent = 0;
+        while (firstContent < line.length() && Character.isWhitespace(line.charAt(firstContent))) {
+            firstContent++;
+        }
+
+        for (int i = end - 1; i > firstContent; i--) {
+            if (Character.isWhitespace(line.charAt(i))) {
+                return i;
+            }
+        }
+
+        return end;
     }
 }

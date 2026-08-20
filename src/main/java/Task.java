@@ -4,24 +4,17 @@
 public class Task {
     /** Text entered by the user to describe the task. */
     private final String description;
+
     /** Whether the task has been completed. */
     private boolean isDone;
 
-    /**
-     * Creates a new task that is initially not done.
-     *
-     * @param description text describing the task
-     */
+    /** Creates a new task that is initially not done. */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
     }
 
-    /**
-     * Returns the symbol used to display this task's completion status.
-     *
-     * @return {@code X} when done, otherwise a blank space
-     */
+    /** Returns the symbol used to display this task's completion status. */
     public String getStatusIcon() {
         return (isDone ? "X" : " ");
     }
