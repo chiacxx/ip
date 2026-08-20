@@ -9,12 +9,15 @@ public class CommandParser {
     private static final String DEADLINE_FORMAT = "Try: deadline <description> /by <deadline>.";
     private static final String EVENT_FORMAT = "Try: event <description> /from <start> /to <end>.";
 
+    /** Creates a parser for E.C.H.O. commands. */
+    public CommandParser() {
+    }
 
     /**
      * Parses one line of user input.
      *
-     * @param input Raw input line
-     * @return Validated command
+     * @param input raw input line
+     * @return validated command
      * @throws EchoException if the input is not a supported command
      */
     public Command parse(String input) throws EchoException {
@@ -27,16 +30,17 @@ public class CommandParser {
         String commandName = commandParts[0].toLowerCase(Locale.ROOT);
 
         return switch (commandName) {
-            case "help" -> parseSimpleCommand(commandParts, Command.Type.HELP,
+            case "help" -> parseNoArgumentCommand(commandParts, Command.Type.HELP,
                     "'help' does not take any arguments. Type 'help' to view list of operations.");
-            case "list" -> parseSimpleCommand(commandParts, Command.Type.LIST,
+            case "list" -> parseNoArgumentCommand(commandParts, Command.Type.LIST,
                     "'list' does not take any arguments. Type 'list' to view all your tasks.");
-            case "todo" -> parseTodo(trimmedInput);
-            case "deadline" -> parseDeadline(trimmedInput);
-            case "event" -> parseEvent(trimmedInput);
-            case "mark" -> parseStatusCommand(commandParts, Command.Type.MARK);
-            case "unmark" -> parseStatusCommand(commandParts, Command.Type.UNMARK);
-            case "bye" -> parseSimpleCommand(commandParts, Command.Type.BYE,
+            case "todo" -> parseTodoCommand(trimmedInput);
+            case "deadline" -> parseDeadlineCommand(trimmedInput);
+            case "event" -> parseEventCommand(trimmedInput);
+            case "mark" -> parseTaskNumberCommand(commandParts, Command.Type.MARK);
+            case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
+            case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
+            case "bye" -> parseNoArgumentCommand(commandParts, Command.Type.BYE,
                     "'bye' does not take any arguments. Type 'bye' when you are ready to disconnect.");
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
@@ -44,8 +48,8 @@ public class CommandParser {
     }
 
     /** Parses a command that accepts no arguments. */
-    private Command parseSimpleCommand(String[] commandParts, Command.Type type,
-                                       String errorMessage) throws EchoException {
+    private Command parseNoArgumentCommand(String[] commandParts, Command.Type type,
+                                           String errorMessage) throws EchoException {
         if (commandParts.length != 1) {
             throw new EchoException(errorMessage);
         }
@@ -53,8 +57,37 @@ public class CommandParser {
         return new Command(type, List.of());
     }
 
+    /** Parses a command that accepts 1 argument (task number):mark, unmark, or delete. */
+    private Command parseTaskNumberCommand(String[] commandParts, Command.Type type)
+            throws EchoException {
+        String commandName = switch (type) {
+            case MARK -> "mark";
+            case UNMARK -> "unmark";
+            case DELETE -> "delete";
+            default -> throw new IllegalArgumentException("Unsupported task command: " + type);
+        };
+        if (commandParts.length != 2) {
+            throw new EchoException("Please provide exactly one task number. Use '"
+                    + commandName + " <number>'.");
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(commandParts[1]);
+        } catch (NumberFormatException exception) {
+            throw new EchoException("'" + commandParts[1] + "' is not a valid task number. "
+                    + "Use the number shown by 'list'.");
+        }
+
+        if (taskNumber < 1) {
+            throw new EchoException("Task numbers start at 1. Use the number shown by 'list'.");
+        }
+
+        return new Command(type, List.of(String.valueOf(taskNumber)));
+    }
+
     /** Parses a todo and keeps its complete description as one argument. */
-    private Command parseTodo(String input) throws EchoException {
+    private Command parseTodoCommand(String input) throws EchoException {
         String description = getCommandContent(input);
         if (description.isEmpty()) {
             throw new EchoException("A todo needs a description. " + TODO_FORMAT);
@@ -63,7 +96,7 @@ public class CommandParser {
     }
 
     /** Parses a deadline in the form 'deadline <description> /by <deadline>'. */
-    private Command parseDeadline(String input) throws EchoException {
+    private Command parseDeadlineCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
             throw new EchoException("A deadline needs a description and a due date. "
@@ -99,7 +132,7 @@ public class CommandParser {
     }
 
     /** Parses an event in the form 'event <description> /from <start> /to <end>'. */
-    private Command parseEvent(String input) throws EchoException {
+    private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
             throw new EchoException("An event needs a description, start, and end time. " + EVENT_FORMAT);
@@ -139,28 +172,7 @@ public class CommandParser {
                 List.of(partsFrom[0].trim(), partsTo[0].trim(), partsTo[1].trim()));
     }
 
-    /** Parses a mark or unmark command and validates its task number syntax. */
-    private Command parseStatusCommand(String[] commandParts, Command.Type type) throws EchoException {
-        String commandName = type == Command.Type.MARK ? "mark" : "unmark";
-        if (commandParts.length != 2) {
-            throw new EchoException("Please provide exactly one task number. Use '"
-                    + commandName + " <number>'.");
-        }
 
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(commandParts[1]);
-        } catch (NumberFormatException exception) {
-            throw new EchoException("'" + commandParts[1] + "' is not a valid task number. "
-                    + "Use the number shown by 'list'.");
-        }
-
-        if (taskNumber < 1) {
-            throw new EchoException("Task numbers start at 1. Use the number shown by 'list'.");
-        }
-
-        return new Command(type, List.of(String.valueOf(taskNumber)));
-    }
 
     /** Checks for a field marker such as /by, ignoring letter case. */
     private static boolean containsMarker(String content, String marker) {

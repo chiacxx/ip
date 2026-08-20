@@ -30,6 +30,7 @@ deadline <description> /by <deadline>
 event <description> /from <start> /to <end>
 mark <task number>
 unmark <task number>
+delete <task number>
 bye
 ```
 

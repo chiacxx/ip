@@ -3,6 +3,13 @@ public class EventTask extends Task {
     private final String from;
     private final String to;
 
+    /**
+     * Creates an event task.
+     *
+     * @param description event description
+     * @param from event start time
+     * @param to event end time
+     */
     public EventTask(String description, String from, String to) {
         super(description);
         this.from = from;

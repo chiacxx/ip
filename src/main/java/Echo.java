@@ -3,7 +3,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * E.C.H.O. - Everyday Conversational & Helpful Operator.
+ * E.C.H.O. - Everyday Conversational &amp; Helpful Operator.
  */
 public class Echo {
     private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
@@ -20,6 +20,7 @@ public class Echo {
               event <description> /from <start> /to <end>  Add an event task
               mark <number>                                Mark a task as done
               unmark <number>                              Mark a task as not done
+              delete <number>                              Remove a task
               bye                                          Disconnect from E.C.H.O.
 
             Task numbers are shown by the 'list' command.""";
@@ -50,7 +51,11 @@ public class Echo {
         this.taskManager = new TaskManager();
     }
 
-    /** Main driver to start an Echo session. */
+    /**
+     * Main driver to start an E.C.H.O. session.
+     *
+     * @param args command-line arguments, currently unused
+     */
     public static void main(String[] args) {
         new Echo().run();
     }
@@ -116,6 +121,10 @@ public class Echo {
             case UNMARK:
                 announceStatus(taskManager.unmarkTask(Integer.parseInt(command.getArgument(0))), false);
                 return false;
+            case DELETE:
+                int taskNumber = Integer.parseInt(command.getArgument(0));
+                announceDeleted(taskNumber, taskManager.deleteTask(taskNumber));
+                return false;
             case BYE:
                 handleBye();
                 return true;
@@ -162,6 +171,12 @@ public class Echo {
     private void announceStatus(Task task, boolean marked) {
         String action = marked ? "marked" : "unmarked";
         printBotResponse("Task " + action + " successfully:\n  " + task);
+    }
+
+    /** Displays the removed task and the number of tasks remaining. */
+    private void announceDeleted(int taskNumber, Task task) {
+        printBotResponse("Successfully removed Task #" + taskNumber + ":\n  " + task
+                + "\nTotal tasks: " + taskManager.size());
     }
 
     /** Prints a message using the standard E.C.H.O. response layout. */

@@ -40,10 +40,11 @@ event team meeting /from 2pm /to 3pm
 list
 mark 1
 unmark 1
+delete 1
 ```
 
 `list` displays every task and its one-based task number. Use that number
-with `mark` or `unmark`.
+with `mark`, `unmark`, or `delete`.
 
 ## Ending the session
 
