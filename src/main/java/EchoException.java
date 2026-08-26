@@ -7,7 +7,7 @@ public class EchoException extends Exception {
     /**
      * Creates an input error with the given explanation.
      *
-     * @param message user-facing explanation of the error
+     * @param message User-facing explanation of the error.
      */
     public EchoException(String message) {
         super(message);

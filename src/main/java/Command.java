@@ -4,7 +4,9 @@ import java.util.List;
  * Represents a validated command entered by the user.
  */
 public final class Command {
-    /** The command actions supported by E.C.H.O. */
+    /**
+     * Represents an action supported by E.C.H.O.
+     */
     public enum Type {
         /** Displays command guidance. */
         HELP,
@@ -26,14 +28,17 @@ public final class Command {
         BYE
     }
 
+    /** The validated action represented by this command. */
     private final Type type;
+
+    /** The validated arguments supplied with this command. */
     private final List<String> arguments;
 
     /**
      * Creates a command with its already-validated arguments.
      *
-     * @param type command type
-     * @param arguments command arguments
+     * @param type Command type.
+     * @param arguments Command arguments.
      */
     public Command(Type type, List<String> arguments) {
         this.type = type;
@@ -43,7 +48,7 @@ public final class Command {
     /**
      * Returns the command type.
      *
-     * @return command type
+     * @return Command type.
      */
     public Type getType() {
         return type;
@@ -52,8 +57,8 @@ public final class Command {
     /**
      * Returns a validated command argument.
      *
-     * @param index zero-based argument position
-     * @return argument at that position
+     * @param index Zero-based argument position.
+     * @return Argument at that position.
      */
     public String getArgument(int index) {
         return arguments.get(index);
