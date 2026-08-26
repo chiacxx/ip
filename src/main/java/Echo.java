@@ -1,67 +1,62 @@
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.io.UncheckedIOException;
+import java.nio.file.Paths;
 
 /**
  * Provides the command-line interface for E.C.H.O., the Everyday Conversational
  * and Helpful Operator.
  */
 public class Echo {
-    /** Horizontal line used to frame E.C.H.O. responses. */
-    private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
-    /** Prompt displayed while waiting for user input. */
-    private static final String PROMPT = "E.C.H.O. ❯ ";
-    /** Indentation applied to each response line. */
-    private static final String RESPONSE_INDENT = "  ";
-    /** Maximum response content width before a line is wrapped. */
-    private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
-
-    /** Help text describing the commands supported by E.C.H.O. */
-    private static final String HELP_MESSAGE = """
-            Available operations:
-              help                                         Show this help message
-              list                                         Display all tasks
-              todo <description>                           Add a todo task
-              deadline <description> /by <dd-mm-yyyy> [HH:MM]  Add a deadline task
-              event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]  Add an event task
-              mark <number>                                Mark a task as done
-              unmark <number>                              Mark a task as not done
-              delete <number>                              Remove a task
-              bye                                          Disconnect from E.C.H.O.
-
-            Task numbers are shown by the 'list' command.""";
-
-    /** Startup banner displayed when an E.C.H.O. session begins. */
-    private static final String BANNER = """
-       ______ _____ _   _  ____  \s
-      |  ____/ ____| | | |/ __ \\ \s
-      | |__ | |    | |_| | |  | |
-      |  __|| |    |  _  | |  | |
-      | |___| |____| | | | |__| |
-      |______\\_____|_| |_|\\____/ \s
-      """;
-
-    /** Farewell messages selected randomly when a session ends. */
-    private static final List<String> FAREWELL_FLAVORS = List.of(
-            "Signal fading... E.C.H.O. signing off. Take care!",
-            "Powering down the transmitter. Catch you soon!",
-            "Going dark now. Thanks for the chat!"
-    );
-
-    /** Random generator used to select a farewell message. */
-    private static final Random RANDOM = new Random();
-
+    /** User interface for input and output. */
+    private final Ui ui;
+    /** Storage used to load and save the application's tasks. */
+    private final Storage storage;
     /** Parser for converting user input into commands. */
     private final CommandParser commandParser;
     /** Manager for task operations and persistence. */
     private final TaskManager taskManager;
 
-    /**
-     * Creates a new E.C.H.O. session with tasks loaded from local storage.
-     */
+    /** Creates a new E.C.H.O. session using the default storage file. */
     public Echo() {
+        this(new Storage());
+    }
+
+    /**
+     * Creates a new E.C.H.O. session using a specific storage file.
+     *
+     * @param filePath File used to load and save tasks.
+     */
+    public Echo(String filePath) {
+        this(new Storage(Paths.get(filePath)));
+    }
+
+    /**
+     * Creates a new E.C.H.O. session using the supplied storage.
+     *
+     * @param storage Storage used to load and save tasks.
+     */
+    public Echo(Storage storage) {
+        this(new Ui(), storage);
+    }
+
+    /**
+     * Creates a session with explicit UI and storage dependencies.
+     *
+     * @param ui User interface used by the session.
+     * @param storage Storage used to load and save tasks.
+     */
+    public Echo(Ui ui, Storage storage) {
+        this.ui = ui;
+        this.storage = storage;
         this.commandParser = new CommandParser();
-        this.taskManager = new TaskManager();
+
+        TaskList tasks;
+        try {
+            tasks = new TaskList(storage.load());
+        } catch (UncheckedIOException exception) {
+            ui.showLoadingError();
+            tasks = new TaskList();
+        }
+        this.taskManager = new TaskManager(tasks, this.storage);
     }
 
     /**
@@ -74,183 +69,33 @@ public class Echo {
     }
 
     /** Reads and processes input until the user disconnects or input ends. */
-    private void run() {
-        System.out.println(BANNER);
-        printBotResponse("Signal established. Online and listening!\nType 'help' to view list of operations!");
+    public void run() {
+        ui.showWelcome();
 
-        try (Scanner scanner = new Scanner(System.in)) {
+        try {
             while (true) {
-                System.out.print(PROMPT);
-
-                if (!scanner.hasNextLine()) {
+                String input = ui.readCommand();
+                if (input == null) {
                     break;
                 }
-
-                String input = scanner.nextLine().trim();
 
                 if (input.isEmpty()) {
                     continue;
                 }
 
                 try {
-                    if (execute(commandParser.parse(input))) {
+                    Command command = commandParser.parse(input);
+                    command.execute(taskManager, ui);
+                    if (command.isExit()) {
                         break;
                     }
                 } catch (EchoException exception) {
-                    printBotResponse(exception.getMessage());
+                    ui.showError(exception.getMessage());
                 }
             }
+        } finally {
+            ui.close();
         }
     }
 
-    /**
-     * Executes a validated command.
-     *
-     * @param command Validated command.
-     * @return Whether the session should end.
-     * @throws EchoException If the command refers to a task that does not exist.
-     */
-    private boolean execute(Command command) throws EchoException {
-        switch (command.getType()) {
-            case HELP:
-                handleHelp();
-                return false;
-            case LIST:
-                handleList();
-                return false;
-            case TODO:
-                announceAdded(taskManager.addTodo(command.getArgument(0)));
-                return false;
-            case DEADLINE:
-                announceAdded(taskManager.addDeadline(command.getArgument(0), command.getArgument(1)));
-                return false;
-            case EVENT:
-                announceAdded(taskManager.addEvent(command.getArgument(0), command.getArgument(1),
-                        command.getArgument(2)));
-                return false;
-            case MARK:
-                announceStatus(taskManager.markTask(Integer.parseInt(command.getArgument(0))), true);
-                return false;
-            case UNMARK:
-                announceStatus(taskManager.unmarkTask(Integer.parseInt(command.getArgument(0))), false);
-                return false;
-            case DELETE:
-                int taskNumber = Integer.parseInt(command.getArgument(0));
-                announceDeleted(taskNumber, taskManager.deleteTask(taskNumber));
-                return false;
-            case BYE:
-                handleBye();
-                return true;
-            default:
-                throw new EchoException("I could not process that command. Try 'help' to see available commands.");
-        }
-    }
-
-    /** Displays the commands and formats supported by E.C.H.O. */
-    private void handleHelp() {
-        printBotResponse(HELP_MESSAGE);
-    }
-
-    /** Displays every task in the order in which it was added. */
-    private void handleList() {
-        if (taskManager.isEmpty()) {
-            printBotResponse("List is empty!");
-            return;
-        }
-
-        StringBuilder response = new StringBuilder("Your tasks:\n");
-        for (int i = 1; i <= taskManager.size(); i++) {
-            response.append(i)
-                    .append(": ")
-                    .append(taskManager.getTask(i))
-                    .append("\n");
-        }
-        printBotResponse(response.toString().stripTrailing());
-    }
-
-    /** Prints a random farewell before ending the session. */
-    private void handleBye() {
-        String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
-        printBotResponse(farewell);
-    }
-
-    /** Displays the task created by a successful add command. */
-    private void announceAdded(Task task) {
-        printBotResponse("Added the following task:\n  " + task
-                + "\nTotal tasks: " + taskManager.size());
-    }
-
-    /** Displays the result of marking or unmarking a task. */
-    private void announceStatus(Task task, boolean marked) {
-        String action = marked ? "marked" : "unmarked";
-        printBotResponse("Task " + action + " successfully:\n  " + task);
-    }
-
-    /** Displays the removed task and the number of tasks remaining. */
-    private void announceDeleted(int taskNumber, Task task) {
-        printBotResponse("Successfully removed Task #" + taskNumber + ":\n  " + task
-                + "\nTotal tasks: " + taskManager.size());
-    }
-
-    /** Prints a message using the standard E.C.H.O. response layout. */
-    private void printBotResponse(String message) {
-        System.out.println(SEPARATOR);
-        System.out.println(wrapResponse(message));
-        System.out.println(SEPARATOR + "\n");
-    }
-
-    /** Wraps each response line so it fits within the separator width. */
-    private String wrapResponse(String message) {
-        String[] lines = message.split("\\R", -1);
-        StringBuilder wrapped = new StringBuilder();
-
-        for (int i = 0; i < lines.length; i++) {
-            if (i > 0) {
-                wrapped.append("\n");
-            }
-            appendWrappedLine(wrapped, lines[i]);
-        }
-
-        return wrapped.toString();
-    }
-
-    /** Appends one response line, breaking it at a word boundary when possible. */
-    private void appendWrappedLine(StringBuilder output, String line) {
-        if (line.isEmpty()) {
-            output.append(RESPONSE_INDENT);
-            return;
-        }
-
-        String remaining = line;
-        boolean firstSegment = true;
-
-        while (!remaining.isEmpty()) {
-            if (!firstSegment) {
-                output.append("\n");
-            }
-
-            int end = Math.min(RESPONSE_CONTENT_WIDTH, remaining.length());
-            int breakAt = end < remaining.length() ? findWordBreak(remaining, end) : end;
-
-            output.append(RESPONSE_INDENT).append(remaining, 0, breakAt);
-            remaining = remaining.substring(breakAt).stripLeading();
-            firstSegment = false;
-        }
-    }
-
-    /** Finds the last whitespace before the width limit, or uses a hard break. */
-    private int findWordBreak(String line, int end) {
-        int firstContent = 0;
-        while (firstContent < line.length() && Character.isWhitespace(line.charAt(firstContent))) {
-            firstContent++;
-        }
-
-        for (int i = end - 1; i > firstContent; i--) {
-            if (Character.isWhitespace(line.charAt(i))) {
-                return i;
-            }
-        }
-
-        return end;
-    }
 }

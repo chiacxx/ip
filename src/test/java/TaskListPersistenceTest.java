@@ -10,8 +10,9 @@ public class TaskListPersistenceTest {
         Path temporaryFile = temporaryDirectory.resolve("echo.txt");
 
         try {
-            TaskList taskList = new TaskList(temporaryFile);
-            TaskManager taskManager = new TaskManager(taskList);
+            Storage storage = new Storage(temporaryFile);
+            TaskList taskList = new TaskList(storage.load());
+            TaskManager taskManager = new TaskManager(taskList, storage);
 
             taskManager.addTodo("read book");
             taskManager.addDeadline("return book", "15-10-2019 18:00");
@@ -33,7 +34,7 @@ public class TaskListPersistenceTest {
                     "T | 0 | read book",
                     "E | 0 | project meeting | 15-10-2019 09:00 | 15-10-2019 10:30"));
 
-            TaskList loadedTaskList = new TaskList(temporaryFile);
+            TaskList loadedTaskList = new TaskList(storage.load());
             if (!loadedTaskList.getTask(1).toString().contains("read book")
                     || !loadedTaskList.getTask(2).toString().contains("project meeting")) {
                 throw new AssertionError("Saved tasks were not loaded correctly");

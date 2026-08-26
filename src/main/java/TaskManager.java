@@ -1,24 +1,37 @@
+import java.util.List;
+
 /**
  * Provides the task operations used by E.C.H.O.
  */
 public class TaskManager {
-    /** The task list used to store and persist tasks. */
+    /** The task list used to store tasks in memory. */
     private final TaskList taskList;
+    /** The storage used to persist task changes. */
+    private final Storage storage;
 
-    /**
-     * Creates a task manager using the default persistent task list.
-     */
+    /** Creates a task manager with an empty list and default storage. */
     public TaskManager() {
-        this(new TaskList());
+        this(new TaskList(), new Storage());
     }
 
     /**
-     * Creates a task manager using the supplied task list.
+     * Creates a task manager using the supplied task list and default storage.
      *
      * @param taskList Task list used by this manager.
      */
     public TaskManager(TaskList taskList) {
+        this(taskList, new Storage());
+    }
+
+    /**
+     * Creates a task manager using the supplied task list and storage.
+     *
+     * @param taskList Task list used by this manager.
+     * @param storage Storage used to save changes.
+     */
+    public TaskManager(TaskList taskList, Storage storage) {
         this.taskList = taskList;
+        this.storage = storage;
     }
 
     /**
@@ -83,6 +96,15 @@ public class TaskManager {
     }
 
     /**
+     * Returns a read-only snapshot of the tasks in insertion order.
+     *
+     * @return Immutable task snapshot.
+     */
+    public List<Task> getTasks() {
+        return taskList.asList();
+    }
+
+    /**
      * Marks a task as done.
      *
      * @param taskNumber One-based task number.
@@ -92,7 +114,7 @@ public class TaskManager {
     public Task markTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
         task.mark();
-        taskList.save();
+        save();
         return task;
     }
 
@@ -106,7 +128,7 @@ public class TaskManager {
     public Task unmarkTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
         task.unmark();
-        taskList.save();
+        save();
         return task;
     }
 
@@ -119,12 +141,15 @@ public class TaskManager {
      */
     public Task deleteTask(int taskNumber) throws EchoException {
         requireTask(taskNumber);
-        return taskList.removeTask(taskNumber);
+        Task removedTask = taskList.removeTask(taskNumber);
+        save();
+        return removedTask;
     }
 
-    /** Adds a task and returns it for display by the user interface. */
+    /** Adds a task and persists the updated list. */
     private Task addTask(Task task) {
         taskList.addTask(task);
+        save();
         return task;
     }
 
@@ -135,5 +160,10 @@ public class TaskManager {
                     + ". Use 'list' to see the available task numbers.");
         }
         return taskList.getTask(taskNumber);
+    }
+
+    /** Persists the current in-memory task list. */
+    private void save() {
+        storage.save(taskList.asList());
     }
 }

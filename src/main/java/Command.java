@@ -1,9 +1,9 @@
 import java.util.List;
 
 /**
- * Represents a validated command entered by the user.
+ * Represents an executable command entered by the user.
  */
-public final class Command {
+public abstract class Command {
     /**
      * Represents an action supported by E.C.H.O.
      */
@@ -28,21 +28,39 @@ public final class Command {
         BYE
     }
 
-    /** The validated action represented by this command. */
+    /** The command type retained during the incremental migration. */
     private final Type type;
 
-    /** The validated arguments supplied with this command. */
+    /** The validated arguments retained during the incremental migration. */
     private final List<String> arguments;
 
     /**
-     * Creates a command with its already-validated arguments.
+     * Creates a command with already-validated arguments.
      *
      * @param type Command type.
-     * @param arguments Command arguments.
+     * @param arguments Validated command arguments.
      */
-    public Command(Type type, List<String> arguments) {
+    protected Command(Type type, List<String> arguments) {
         this.type = type;
         this.arguments = List.copyOf(arguments);
+    }
+
+    /**
+     * Executes this command using the application's task service and UI.
+     *
+     * @param taskManager Service used to perform task operations.
+     * @param ui Interface used to display results.
+     * @throws EchoException If the command cannot be completed.
+     */
+    public abstract void execute(TaskManager taskManager, Ui ui) throws EchoException;
+
+    /**
+     * Checks whether executing this command should end the session.
+     *
+     * @return Whether this command exits E.C.H.O.
+     */
+    public boolean isExit() {
+        return false;
     }
 
     /**

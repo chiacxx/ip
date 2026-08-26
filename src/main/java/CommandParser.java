@@ -1,5 +1,4 @@
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -51,8 +50,7 @@ public class CommandParser {
             case "mark" -> parseTaskNumberCommand(commandParts, Command.Type.MARK);
             case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
             case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
-            case "bye" -> parseNoArgumentCommand(commandParts, Command.Type.BYE,
-                    "'bye' does not take any arguments. Type 'bye' when you are ready to disconnect.");
+            case "bye" -> parseExitCommand(commandParts);
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
         };
@@ -65,7 +63,21 @@ public class CommandParser {
             throw new EchoException(errorMessage);
         }
 
-        return new Command(type, List.of());
+        return switch (type) {
+        case HELP -> new HelpCommand();
+        case LIST -> new ListCommand();
+        default -> throw new IllegalArgumentException("Unsupported no-argument command: " + type);
+        };
+    }
+
+    /** Parses the command that ends the current session. */
+    private Command parseExitCommand(String[] commandParts) throws EchoException {
+        if (commandParts.length != 1) {
+            throw new EchoException("'bye' does not take any arguments. "
+                    + "Type 'bye' when you are ready to disconnect.");
+        }
+
+        return new ExitCommand();
     }
 
     /** Parses a task command with one task-number argument. */
@@ -94,7 +106,12 @@ public class CommandParser {
             throw new EchoException("Task numbers start at 1. Use the number shown by 'list'.");
         }
 
-        return new Command(type, List.of(String.valueOf(taskNumber)));
+        return switch (type) {
+        case MARK -> new MarkCommand(taskNumber);
+        case UNMARK -> new UnmarkCommand(taskNumber);
+        case DELETE -> new DeleteCommand(taskNumber);
+        default -> throw new IllegalArgumentException("Unsupported task command: " + type);
+        };
     }
 
     /** Parses a todo command and keeps its complete description as one argument. */
@@ -103,7 +120,7 @@ public class CommandParser {
         if (description.isEmpty()) {
             throw new EchoException("A todo needs a description. " + TODO_FORMAT);
         }
-        return new Command(Command.Type.TODO, List.of(description));
+        return new TodoCommand(description);
     }
 
     /** Parses a deadline command with a date and optional time after {@code /by}. */
@@ -142,7 +159,7 @@ public class CommandParser {
         String dueDate = parts[1].trim();
         validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
-        return new Command(Command.Type.DEADLINE, List.of(description, dueDate));
+        return new DeadlineCommand(description, dueDate);
     }
 
     /** Parses an event command with dates and optional times after {@code /from} and {@code /to}. */
@@ -188,7 +205,7 @@ public class CommandParser {
         validateDateTime(startDate, "event start", EVENT_FORMAT);
         validateDateTime(endDate, "event end", EVENT_FORMAT);
 
-        return new Command(Command.Type.EVENT, List.of(description, startDate, endDate));
+        return new EventCommand(description, startDate, endDate);
     }
 
     /** Validates a date with an optional time and reports the expected format on failure. */
