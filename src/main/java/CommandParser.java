@@ -65,7 +65,7 @@ public class CommandParser {
             throw new EchoException(errorMessage);
         }
 
-        return new Command(type, List.of());
+        return new ParsedCommand(type, List.of());
     }
 
     /** Parses a task command with one task-number argument. */
@@ -94,7 +94,7 @@ public class CommandParser {
             throw new EchoException("Task numbers start at 1. Use the number shown by 'list'.");
         }
 
-        return new Command(type, List.of(String.valueOf(taskNumber)));
+        return new ParsedCommand(type, List.of(String.valueOf(taskNumber)));
     }
 
     /** Parses a todo command and keeps its complete description as one argument. */
@@ -103,7 +103,7 @@ public class CommandParser {
         if (description.isEmpty()) {
             throw new EchoException("A todo needs a description. " + TODO_FORMAT);
         }
-        return new Command(Command.Type.TODO, List.of(description));
+        return new ParsedCommand(Command.Type.TODO, List.of(description));
     }
 
     /** Parses a deadline command with a date and optional time after {@code /by}. */
@@ -142,7 +142,7 @@ public class CommandParser {
         String dueDate = parts[1].trim();
         validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
-        return new Command(Command.Type.DEADLINE, List.of(description, dueDate));
+        return new ParsedCommand(Command.Type.DEADLINE, List.of(description, dueDate));
     }
 
     /** Parses an event command with dates and optional times after {@code /from} and {@code /to}. */
@@ -188,7 +188,7 @@ public class CommandParser {
         validateDateTime(startDate, "event start", EVENT_FORMAT);
         validateDateTime(endDate, "event end", EVENT_FORMAT);
 
-        return new Command(Command.Type.EVENT, List.of(description, startDate, endDate));
+        return new ParsedCommand(Command.Type.EVENT, List.of(description, startDate, endDate));
     }
 
     /** Validates a date with an optional time and reports the expected format on failure. */

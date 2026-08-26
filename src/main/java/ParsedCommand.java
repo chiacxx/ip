@@ -1,0 +1,61 @@
+/**
+ * Executes the existing parsed command representation during the command-class migration.
+ *
+ * <p>This temporary implementation keeps all current command behavior in one place while
+ * individual command classes are extracted in later increments.</p>
+ */
+public class ParsedCommand extends Command {
+    /**
+     * Creates a parsed command with already-validated arguments.
+     *
+     * @param type Command type.
+     * @param arguments Validated command arguments.
+     */
+    public ParsedCommand(Type type, java.util.List<String> arguments) {
+        super(type, arguments);
+    }
+
+    /** Executes the parsed command using the existing command behavior. */
+    @Override
+    public void execute(TaskManager taskManager, Ui ui) throws EchoException {
+        switch (getType()) {
+        case HELP:
+            ui.showHelp();
+            return;
+        case LIST:
+            ui.showTaskList(taskManager.getTasks());
+            return;
+        case TODO:
+            ui.showAdded(taskManager.addTodo(getArgument(0)), taskManager.size());
+            return;
+        case DEADLINE:
+            ui.showAdded(taskManager.addDeadline(getArgument(0), getArgument(1)), taskManager.size());
+            return;
+        case EVENT:
+            ui.showAdded(taskManager.addEvent(getArgument(0), getArgument(1), getArgument(2)),
+                    taskManager.size());
+            return;
+        case MARK:
+            ui.showStatus(taskManager.markTask(Integer.parseInt(getArgument(0))), true);
+            return;
+        case UNMARK:
+            ui.showStatus(taskManager.unmarkTask(Integer.parseInt(getArgument(0))), false);
+            return;
+        case DELETE:
+            int taskNumber = Integer.parseInt(getArgument(0));
+            ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
+            return;
+        case BYE:
+            ui.showFarewell();
+            return;
+        default:
+            throw new EchoException("I could not process that command. Try 'help' to see available commands.");
+        }
+    }
+
+    /** A parsed bye command ends the session after execution. */
+    @Override
+    public boolean isExit() {
+        return getType() == Type.BYE;
+    }
+}

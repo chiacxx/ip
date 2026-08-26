@@ -84,7 +84,9 @@ public class Echo {
                 }
 
                 try {
-                    if (execute(commandParser.parse(input))) {
+                    Command command = commandParser.parse(input);
+                    command.execute(taskManager, ui);
+                    if (command.isExit()) {
                         break;
                     }
                 } catch (EchoException exception) {
@@ -93,50 +95,6 @@ public class Echo {
             }
         } finally {
             ui.close();
-        }
-    }
-
-    /**
-     * Executes a validated command.
-     *
-     * @param command Validated command.
-     * @return Whether the session should end.
-     * @throws EchoException If the command refers to a task that does not exist.
-     */
-    private boolean execute(Command command) throws EchoException {
-        switch (command.getType()) {
-            case HELP:
-                ui.showHelp();
-                return false;
-            case LIST:
-                ui.showTaskList(taskManager.getTasks());
-                return false;
-            case TODO:
-                ui.showAdded(taskManager.addTodo(command.getArgument(0)), taskManager.size());
-                return false;
-            case DEADLINE:
-                ui.showAdded(taskManager.addDeadline(command.getArgument(0), command.getArgument(1)),
-                        taskManager.size());
-                return false;
-            case EVENT:
-                ui.showAdded(taskManager.addEvent(command.getArgument(0), command.getArgument(1),
-                        command.getArgument(2)), taskManager.size());
-                return false;
-            case MARK:
-                ui.showStatus(taskManager.markTask(Integer.parseInt(command.getArgument(0))), true);
-                return false;
-            case UNMARK:
-                ui.showStatus(taskManager.unmarkTask(Integer.parseInt(command.getArgument(0))), false);
-                return false;
-            case DELETE:
-                int taskNumber = Integer.parseInt(command.getArgument(0));
-                ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
-                return false;
-            case BYE:
-                ui.showFarewell();
-                return true;
-            default:
-                throw new EchoException("I could not process that command. Try 'help' to see available commands.");
         }
     }
 
