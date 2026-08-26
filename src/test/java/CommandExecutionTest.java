@@ -31,5 +31,16 @@ public class CommandExecutionTest {
         if (!(new CommandParser().parse("delete 1") instanceof DeleteCommand)) {
             throw new AssertionError("delete should create a DeleteCommand");
         }
+        if (!(new CommandParser().parse("todo read book") instanceof TodoCommand)) {
+            throw new AssertionError("todo should create a TodoCommand");
+        }
+        if (!(new CommandParser().parse("deadline return book /by 15-10-2019")
+                instanceof DeadlineCommand)) {
+            throw new AssertionError("deadline should create a DeadlineCommand");
+        }
+        if (!(new CommandParser().parse("event meeting /from 15-10-2019 /to 16-10-2019")
+                instanceof EventCommand)) {
+            throw new AssertionError("event should create an EventCommand");
+        }
     }
 }

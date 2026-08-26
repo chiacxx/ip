@@ -19,16 +19,6 @@ public class ParsedCommand extends Command {
     @Override
     public void execute(TaskManager taskManager, Ui ui) throws EchoException {
         switch (getType()) {
-        case TODO:
-            ui.showAdded(taskManager.addTodo(getArgument(0)), taskManager.size());
-            return;
-        case DEADLINE:
-            ui.showAdded(taskManager.addDeadline(getArgument(0), getArgument(1)), taskManager.size());
-            return;
-        case EVENT:
-            ui.showAdded(taskManager.addEvent(getArgument(0), getArgument(1), getArgument(2)),
-                    taskManager.size());
-            return;
         default:
             throw new EchoException("I could not process that command. Try 'help' to see available commands.");
         }

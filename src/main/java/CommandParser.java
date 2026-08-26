@@ -121,7 +121,7 @@ public class CommandParser {
         if (description.isEmpty()) {
             throw new EchoException("A todo needs a description. " + TODO_FORMAT);
         }
-        return new ParsedCommand(Command.Type.TODO, List.of(description));
+        return new TodoCommand(description);
     }
 
     /** Parses a deadline command with a date and optional time after {@code /by}. */
@@ -160,7 +160,7 @@ public class CommandParser {
         String dueDate = parts[1].trim();
         validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
-        return new ParsedCommand(Command.Type.DEADLINE, List.of(description, dueDate));
+        return new DeadlineCommand(description, dueDate);
     }
 
     /** Parses an event command with dates and optional times after {@code /from} and {@code /to}. */
@@ -206,7 +206,7 @@ public class CommandParser {
         validateDateTime(startDate, "event start", EVENT_FORMAT);
         validateDateTime(endDate, "event end", EVENT_FORMAT);
 
-        return new ParsedCommand(Command.Type.EVENT, List.of(description, startDate, endDate));
+        return new EventCommand(description, startDate, endDate);
     }
 
     /** Validates a date with an optional time and reports the expected format on failure. */
