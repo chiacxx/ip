@@ -45,17 +45,8 @@ public class ParsedCommand extends Command {
             int taskNumber = Integer.parseInt(getArgument(0));
             ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
             return;
-        case BYE:
-            ui.showFarewell();
-            return;
         default:
             throw new EchoException("I could not process that command. Try 'help' to see available commands.");
         }
-    }
-
-    /** A parsed bye command ends the session after execution. */
-    @Override
-    public boolean isExit() {
-        return getType() == Type.BYE;
     }
 }

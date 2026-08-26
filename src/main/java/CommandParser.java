@@ -51,8 +51,7 @@ public class CommandParser {
             case "mark" -> parseTaskNumberCommand(commandParts, Command.Type.MARK);
             case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
             case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
-            case "bye" -> parseNoArgumentCommand(commandParts, Command.Type.BYE,
-                    "'bye' does not take any arguments. Type 'bye' when you are ready to disconnect.");
+            case "bye" -> parseExitCommand(commandParts);
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
         };
@@ -66,6 +65,16 @@ public class CommandParser {
         }
 
         return new ParsedCommand(type, List.of());
+    }
+
+    /** Parses the command that ends the current session. */
+    private Command parseExitCommand(String[] commandParts) throws EchoException {
+        if (commandParts.length != 1) {
+            throw new EchoException("'bye' does not take any arguments. "
+                    + "Type 'bye' when you are ready to disconnect.");
+        }
+
+        return new ExitCommand();
     }
 
     /** Parses a task command with one task-number argument. */
