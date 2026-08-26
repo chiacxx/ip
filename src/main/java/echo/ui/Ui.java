@@ -1,6 +1,10 @@
+package echo.ui;
+
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+
+import echo.task.Task;
 
 /**
  * Handles all command-line interaction for E.C.H.O.

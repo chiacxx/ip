@@ -1,4 +1,9 @@
+package echo.task;
+
 import java.util.List;
+
+import echo.EchoException;
+import echo.storage.Storage;
 
 /**
  * Provides the task operations used by E.C.H.O.

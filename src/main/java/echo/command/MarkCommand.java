@@ -1,3 +1,9 @@
+package echo.command;
+
+import echo.EchoException;
+import echo.task.TaskManager;
+import echo.ui.Ui;
+
 /**
  * Marks a task as done.
  */

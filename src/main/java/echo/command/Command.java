@@ -1,4 +1,10 @@
+package echo.command;
+
 import java.util.List;
+
+import echo.EchoException;
+import echo.task.TaskManager;
+import echo.ui.Ui;
 
 /**
  * Represents an executable command entered by the user.

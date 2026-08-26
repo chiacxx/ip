@@ -1,3 +1,5 @@
+package echo;
+
 /**
  * Represents an input error that E.C.H.O. can explain to the user.
  */

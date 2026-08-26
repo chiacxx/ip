@@ -13,7 +13,7 @@ Prerequisites: JDK 25 and the latest version of IntelliJ.
    1. If there are any further prompts, accept the defaults.
 1. Configure the project to use **JDK 25** as explained in the [IntelliJ documentation](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
    In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. Locate `src/main/java/Echo.java`, right-click it, and choose `Run Echo.main()`.
+1. Locate `src/main/java/echo/Echo.java`, right-click it, and choose `Run Echo.main()`.
    E.C.H.O. should start and display its welcome message.
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
