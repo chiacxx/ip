@@ -149,24 +149,10 @@ public class TaskList {
             task = new DeadlineTask(description, fields[3]);
             break;
         case "E":
-            if (fields.length < 4) {
+            if (fields.length < 5) {
                 return;
             }
-
-            String from;
-            String to;
-            if (fields.length >= 5) {
-                // Accept the previous five-field format while saving the new four-field format.
-                from = fields[3];
-                to = fields[4];
-            } else {
-                String eventDetails = fields[3];
-                int separator = eventDetails.lastIndexOf(' ');
-                from = separator < 0 ? eventDetails : eventDetails.substring(0, separator);
-                to = separator < 0 ? "" : eventDetails.substring(separator + 1);
-            }
-
-            task = new EventTask(description, from, to);
+            task = new EventTask(description, fields[3], fields[4]);
             break;
         default:
             return;

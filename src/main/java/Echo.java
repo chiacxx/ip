@@ -16,8 +16,8 @@ public class Echo {
               help                                         Show this help message
               list                                         Display all tasks
               todo <description>                           Add a todo task
-              deadline <description> /by <deadline>        Add a deadline task
-              event <description> /from <start> /to <end>  Add an event task
+              deadline <description> /by <dd-mm-yyyy> [HH:MM]  Add a deadline task
+              event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]  Add an event task
               mark <number>                                Mark a task as done
               unmark <number>                              Mark a task as not done
               delete <number>                              Remove a task

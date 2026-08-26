@@ -32,7 +32,7 @@ public class TaskManager {
      * Creates and stores a deadline task.
      *
      * @param description task description
-     * @param by deadline text
+     * @param by deadline date with an optional time
      * @return the new task
      */
     public Task addDeadline(String description, String by) {
@@ -43,8 +43,8 @@ public class TaskManager {
      * Creates and stores an event task.
      *
      * @param description event description
-     * @param from event start time
-     * @param to event end time
+     * @param from event start date with an optional time
+     * @param to event end date with an optional time
      * @return the new task
      */
     public Task addEvent(String description, String from, String to) {
