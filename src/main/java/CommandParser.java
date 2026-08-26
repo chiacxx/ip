@@ -1,5 +1,4 @@
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -67,7 +66,7 @@ public class CommandParser {
         return switch (type) {
         case HELP -> new HelpCommand();
         case LIST -> new ListCommand();
-        default -> new ParsedCommand(type, List.of());
+        default -> throw new IllegalArgumentException("Unsupported no-argument command: " + type);
         };
     }
 
