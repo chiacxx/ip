@@ -6,7 +6,7 @@ public class DeadlineTask extends Task {
      * Creates a deadline task.
      *
      * @param description task description
-     * @param by deadline text
+     * @param by deadline date with an optional time
      */
     public DeadlineTask(String description, String by) {
         super(description);
@@ -20,6 +20,7 @@ public class DeadlineTask extends Task {
 
     @Override
     public String toString() {
-        return "[Deadline]" + super.toString() + " (by: " + this.by + ")";
+        return "[Deadline]" + super.toString() + " (by: "
+                + DateTimeParser.formatForDisplay(this.by) + ")";
     }
 }

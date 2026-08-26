@@ -156,10 +156,11 @@ public class TaskList {
             String from;
             String to;
             if (fields.length >= 5) {
-                // Accept the previous five-field format while saving the new four-field format.
+                // Accept the current five-field format with separate event dates.
                 from = fields[3];
                 to = fields[4];
             } else {
+                // Accept the legacy four-field format with both dates in one field.
                 String eventDetails = fields[3];
                 int separator = eventDetails.lastIndexOf(' ');
                 from = separator < 0 ? eventDetails : eventDetails.substring(0, separator);

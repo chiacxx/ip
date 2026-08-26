@@ -1,7 +1,4 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,13 +7,12 @@ import java.util.Locale;
  */
 public class CommandParser {
     private static final String TODO_FORMAT = "Try: todo <description>.";
-    private static final String DATE_FORMAT = "dd-mm-yyyy";
-    private static final String DEADLINE_FORMAT = "Try: deadline <description> /by <date "
-            + DATE_FORMAT + ">.";
-    private static final String EVENT_FORMAT = "Try: event <description> /from <date "
-            + DATE_FORMAT + "> /to <date " + DATE_FORMAT + ">.";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-uuuu")
-            .withResolverStyle(ResolverStyle.STRICT);
+    private static final String DATE_TIME_ARGUMENT = "<" + DateTimeParser.DATE_FORMAT + "> ["
+            + DateTimeParser.TIME_FORMAT + "]";
+    private static final String DEADLINE_FORMAT = "Try: deadline <description> /by "
+            + DATE_TIME_ARGUMENT + ".";
+    private static final String EVENT_FORMAT = "Try: event <description> /from "
+            + DATE_TIME_ARGUMENT + " /to " + DATE_TIME_ARGUMENT + ".";
 
     /** Creates a parser for E.C.H.O. commands. */
     public CommandParser() {
@@ -104,7 +100,7 @@ public class CommandParser {
         return new Command(Command.Type.TODO, List.of(description));
     }
 
-    /** Parses a deadline in the form 'deadline <description> /by <date dd-mm-yyyy>'. */
+    /** Parses a deadline with a date and optional time after '/by'. */
     private Command parseDeadlineCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -138,12 +134,12 @@ public class CommandParser {
 
         String description = parts[0].trim();
         String dueDate = parts[1].trim();
-        validateDate(dueDate, "deadline", DEADLINE_FORMAT);
+        validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
         return new Command(Command.Type.DEADLINE, List.of(description, dueDate));
     }
 
-    /** Parses an event in the form 'event <description> /from <date dd-mm-yyyy> /to <date dd-mm-yyyy>'. */
+    /** Parses an event with dates and optional times after '/from' and '/to'. */
     private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -183,26 +179,27 @@ public class CommandParser {
         String description = partsFrom[0].trim();
         String startDate = partsTo[0].trim();
         String endDate = partsTo[1].trim();
-        validateDate(startDate, "event start", EVENT_FORMAT);
-        validateDate(endDate, "event end", EVENT_FORMAT);
+        validateDateTime(startDate, "event start", EVENT_FORMAT);
+        validateDateTime(endDate, "event end", EVENT_FORMAT);
 
         return new Command(Command.Type.EVENT, List.of(description, startDate, endDate));
     }
 
-    /** Validates that a date uses the required format and represents a real calendar date. */
-    private static void validateDate(String date, String fieldName, String commandFormat)
+    /** Validates a date with an optional time and reports the expected format on failure. */
+    private static void validateDateTime(String date, String fieldName, String commandFormat)
             throws EchoException {
-        boolean hasRequiredShape = date.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}");
-        if (!hasRequiredShape) {
-            throw new EchoException("The " + fieldName + " date '" + date
-                    + "' must use the format " + DATE_FORMAT + ". " + commandFormat);
-        }
-
         try {
-            LocalDate.parse(date, DATE_FORMATTER);
+            DateTimeParser.validate(date);
         } catch (DateTimeParseException exception) {
-            throw new EchoException("'" + date + "' is not a valid calendar date. "
-                    + "Please use the format " + DATE_FORMAT + ". " + commandFormat);
+            if (!date.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}( [0-9]{2}:[0-9]{2})?")) {
+                throw new EchoException("The " + fieldName + " must use "
+                        + DateTimeParser.DATE_FORMAT + " with an optional 24-hour time "
+                        + DateTimeParser.TIME_FORMAT + ". " + commandFormat);
+            }
+
+            throw new EchoException("'" + date + "' is not a valid date or time. "
+                    + "Please use " + DateTimeParser.DATE_TIME_FORMAT
+                    + " when including a time. " + commandFormat);
         }
     }
 

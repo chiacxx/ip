@@ -14,24 +14,24 @@ public class TaskListPersistenceTest {
             TaskManager taskManager = new TaskManager(taskList);
 
             taskManager.addTodo("read book");
-            taskManager.addDeadline("return book", "June 6th");
-            taskManager.addEvent("project meeting", "Aug 6th", "2-4pm");
+            taskManager.addDeadline("return book", "15-10-2019 18:00");
+            taskManager.addEvent("project meeting", "15-10-2019 09:00", "15-10-2019 10:30");
             assertFileContents(temporaryFile, List.of(
                     "T | 0 | read book",
-                    "D | 0 | return book | June 6th",
-                    "E | 0 | project meeting | Aug 6th 2-4pm"));
+                    "D | 0 | return book | 15-10-2019 18:00",
+                    "E | 0 | project meeting | 15-10-2019 09:00 | 15-10-2019 10:30"));
 
             taskManager.markTask(1);
             assertFileContents(temporaryFile, List.of(
                     "T | 1 | read book",
-                    "D | 0 | return book | June 6th",
-                    "E | 0 | project meeting | Aug 6th 2-4pm"));
+                    "D | 0 | return book | 15-10-2019 18:00",
+                    "E | 0 | project meeting | 15-10-2019 09:00 | 15-10-2019 10:30"));
 
             taskManager.unmarkTask(1);
             taskManager.deleteTask(2);
             assertFileContents(temporaryFile, List.of(
                     "T | 0 | read book",
-                    "E | 0 | project meeting | Aug 6th 2-4pm"));
+                    "E | 0 | project meeting | 15-10-2019 09:00 | 15-10-2019 10:30"));
 
             TaskList loadedTaskList = new TaskList(temporaryFile);
             if (!loadedTaskList.getTask(1).toString().contains("read book")

@@ -1,3 +1,4 @@
-D | 1 | return book | June 6th
-E | 0 | project meeting | 2 4
-D | 0 | run | 22-12-1999
+T | 0 | read book
+D | 0 | homework | 22-09-2026
+D | 0 | test | 19-09-2026 23:40
+E | 0 | meeting | 27-08-2026 18:00 | 27-08-2026 19:00
