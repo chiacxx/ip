@@ -9,18 +9,9 @@ public class TaskManager {
     /** The storage used to persist task changes. */
     private final Storage storage;
 
-    /** Creates a task manager using the default persistent task list. */
+    /** Creates a task manager with an empty list and default storage. */
     public TaskManager() {
-        this(new Storage());
-    }
-
-    /**
-     * Creates a task manager using the supplied storage and its saved tasks.
-     *
-     * @param storage Storage used to load and save tasks.
-     */
-    private TaskManager(Storage storage) {
-        this(new TaskList(storage.load()), storage);
+        this(new TaskList(), new Storage());
     }
 
     /**

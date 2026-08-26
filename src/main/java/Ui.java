@@ -99,6 +99,11 @@ public class Ui implements AutoCloseable {
         showMessage(message);
     }
 
+    /** Displays a recoverable error that occurred while loading saved tasks. */
+    public void showLoadingError() {
+        showError("I could not load your saved tasks. Starting with an empty list.");
+    }
+
     /** Displays all tasks, or an empty-list message when there are no tasks. */
     public void showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
