@@ -26,8 +26,8 @@ Run `help` in E.C.H.O. to display the available commands. The supported formats 
 help
 list
 todo <description>
-deadline <description> /by <deadline>
-event <description> /from <start> /to <end>
+deadline <description> /by <date dd-mm-yyyy>
+event <description> /from <date dd-mm-yyyy> /to <date dd-mm-yyyy>
 mark <task number>
 unmark <task number>
 delete <task number>
