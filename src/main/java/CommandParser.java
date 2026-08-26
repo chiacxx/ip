@@ -107,7 +107,12 @@ public class CommandParser {
             throw new EchoException("Task numbers start at 1. Use the number shown by 'list'.");
         }
 
-        return new ParsedCommand(type, List.of(String.valueOf(taskNumber)));
+        return switch (type) {
+        case MARK -> new MarkCommand(taskNumber);
+        case UNMARK -> new UnmarkCommand(taskNumber);
+        case DELETE -> new DeleteCommand(taskNumber);
+        default -> throw new IllegalArgumentException("Unsupported task command: " + type);
+        };
     }
 
     /** Parses a todo command and keeps its complete description as one argument. */

@@ -22,5 +22,14 @@ public class CommandExecutionTest {
         if (!(new CommandParser().parse("list") instanceof ListCommand)) {
             throw new AssertionError("list should create a ListCommand");
         }
+        if (!(new CommandParser().parse("mark 1") instanceof MarkCommand)) {
+            throw new AssertionError("mark should create a MarkCommand");
+        }
+        if (!(new CommandParser().parse("unmark 1") instanceof UnmarkCommand)) {
+            throw new AssertionError("unmark should create an UnmarkCommand");
+        }
+        if (!(new CommandParser().parse("delete 1") instanceof DeleteCommand)) {
+            throw new AssertionError("delete should create a DeleteCommand");
+        }
     }
 }

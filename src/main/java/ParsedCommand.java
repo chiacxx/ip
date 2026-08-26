@@ -29,16 +29,6 @@ public class ParsedCommand extends Command {
             ui.showAdded(taskManager.addEvent(getArgument(0), getArgument(1), getArgument(2)),
                     taskManager.size());
             return;
-        case MARK:
-            ui.showStatus(taskManager.markTask(Integer.parseInt(getArgument(0))), true);
-            return;
-        case UNMARK:
-            ui.showStatus(taskManager.unmarkTask(Integer.parseInt(getArgument(0))), false);
-            return;
-        case DELETE:
-            int taskNumber = Integer.parseInt(getArgument(0));
-            ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
-            return;
         default:
             throw new EchoException("I could not process that command. Try 'help' to see available commands.");
         }
