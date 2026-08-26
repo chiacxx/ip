@@ -1,3 +1,8 @@
+package echo.command;
+
+import echo.task.TaskManager;
+import echo.ui.Ui;
+
 /**
  * Displays E.C.H.O.'s command guidance.
  */

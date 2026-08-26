@@ -1,3 +1,5 @@
+package echo.storage;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -6,6 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import echo.task.DeadlineTask;
+import echo.task.EventTask;
+import echo.task.Task;
+import echo.task.TodoTask;
 
 /**
  * Loads tasks from and saves tasks to E.C.H.O.'s persistence file.

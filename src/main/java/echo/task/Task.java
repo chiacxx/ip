@@ -1,3 +1,5 @@
+package echo.task;
+
 /**
  * Represents a task in E.C.H.O.'s task list.
  */

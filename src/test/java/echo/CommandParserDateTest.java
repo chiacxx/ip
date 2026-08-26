@@ -1,4 +1,11 @@
+package echo;
+
 import java.util.List;
+
+import echo.command.Command;
+import echo.command.CommandParser;
+import echo.task.DeadlineTask;
+import echo.task.EventTask;
 
 /** Checks date and optional time validation and display formatting. */
 public class CommandParserDateTest {

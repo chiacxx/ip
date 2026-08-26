@@ -1,3 +1,5 @@
+package echo.task;
+
 /**
  * Represents a task that does not have a deadline or event time.
  */

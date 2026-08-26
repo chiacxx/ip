@@ -1,6 +1,12 @@
+package echo;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import echo.storage.Storage;
+import echo.task.TaskList;
+import echo.task.TaskManager;
 
 /** Basic read/write checks for task-list persistence. */
 public class TaskListPersistenceTest {

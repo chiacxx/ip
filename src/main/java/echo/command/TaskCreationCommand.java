@@ -1,4 +1,10 @@
+package echo.command;
+
 import java.util.List;
+
+import echo.task.Task;
+import echo.task.TaskManager;
+import echo.ui.Ui;
 
 /**
  * Base class for commands that create tasks from a description.

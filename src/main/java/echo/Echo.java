@@ -1,5 +1,14 @@
+package echo;
+
 import java.io.UncheckedIOException;
 import java.nio.file.Paths;
+
+import echo.command.Command;
+import echo.command.CommandParser;
+import echo.storage.Storage;
+import echo.task.TaskList;
+import echo.task.TaskManager;
+import echo.ui.Ui;
 
 /**
  * Provides the command-line interface for E.C.H.O., the Everyday Conversational

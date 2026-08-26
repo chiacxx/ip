@@ -1,3 +1,17 @@
+package echo;
+
+import echo.command.Command;
+import echo.command.CommandParser;
+import echo.command.DeadlineCommand;
+import echo.command.DeleteCommand;
+import echo.command.EventCommand;
+import echo.command.ExitCommand;
+import echo.command.HelpCommand;
+import echo.command.ListCommand;
+import echo.command.MarkCommand;
+import echo.command.TodoCommand;
+import echo.command.UnmarkCommand;
+
 /** Checks that the exit command is represented by its dedicated command class. */
 public class CommandExecutionTest {
     /** Runs the exit-command checks without requiring an external test framework. */

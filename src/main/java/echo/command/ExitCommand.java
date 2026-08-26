@@ -1,4 +1,9 @@
+package echo.command;
+
 import java.util.List;
+
+import echo.task.TaskManager;
+import echo.ui.Ui;
 
 /**
  * Ends the current E.C.H.O. session.
