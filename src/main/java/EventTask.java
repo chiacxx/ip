@@ -17,6 +17,11 @@ public class EventTask extends Task {
     }
 
     @Override
+    public String toFileFormat() {
+        return "E | " + getDoneFlag() + " | " + getDescription() + " | " + from + " " + to;
+    }
+
+    @Override
     public String toString() {
         return "[Event]" + super.toString() + " (from: " + this.from + ", to: " + this.to + ")";
     }

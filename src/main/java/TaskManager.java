@@ -4,9 +4,18 @@
 public class TaskManager {
     private final TaskList taskList;
 
-    /** Creates an empty task manager. */
+    /** Creates a task manager using the default persistent task list. */
     public TaskManager() {
-        this.taskList = new TaskList();
+        this(new TaskList());
+    }
+
+    /**
+     * Creates a task manager using the supplied task list.
+     *
+     * @param taskList task list used by this manager
+     */
+    public TaskManager(TaskList taskList) {
+        this.taskList = taskList;
     }
 
     /**
@@ -80,6 +89,7 @@ public class TaskManager {
     public Task markTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
         task.mark();
+        taskList.save();
         return task;
     }
 
@@ -93,6 +103,7 @@ public class TaskManager {
     public Task unmarkTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
         task.unmark();
+        taskList.save();
         return task;
     }
 

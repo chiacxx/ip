@@ -37,6 +37,25 @@ public class Task {
         this.isDone = false;
     }
 
+    /**
+     * Returns this task in the format used by task-list persistence.
+     *
+     * @return serialized task data
+     */
+    public String toFileFormat() {
+        return "T | " + getDoneFlag() + " | " + description;
+    }
+
+    /** Returns the completion flag expected by the storage format. */
+    protected int getDoneFlag() {
+        return isDone ? 1 : 0;
+    }
+
+    /** Returns the user-entered task description to subclasses. */
+    protected String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         return "[" + this.getStatusIcon() + "] " + this.description;

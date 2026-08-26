@@ -45,7 +45,7 @@ public class Echo {
     private final CommandParser commandParser;
     private final TaskManager taskManager;
 
-    /** Creates a new E.C.H.O. session with an empty task list. */
+    /** Creates a new E.C.H.O. session with tasks loaded from local storage. */
     public Echo() {
         this.commandParser = new CommandParser();
         this.taskManager = new TaskManager();
