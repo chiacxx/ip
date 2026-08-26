@@ -1,7 +1,19 @@
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 /** Represents an Event Task. */
 public class EventTask extends Task {
-    private final String from;
-    private final String to;
+    /** Event start date stored as a Java date value. */
+    private final LocalDate from;
+
+    /** Optional event start time stored as a Java time value. */
+    private final LocalTime fromTime;
+
+    /** Event end date stored as a Java date value. */
+    private final LocalDate to;
+
+    /** Optional event end time stored as a Java time value. */
+    private final LocalTime toTime;
 
     /**
      * Creates an event task.
@@ -12,19 +24,25 @@ public class EventTask extends Task {
      */
     public EventTask(String description, String from, String to) {
         super(description);
-        this.from = from;
-        this.to = to;
+        DateTimeParser.DateTimeValue fromDateTime = DateTimeParser.parse(from);
+        DateTimeParser.DateTimeValue toDateTime = DateTimeParser.parse(to);
+        this.from = fromDateTime.date();
+        this.fromTime = fromDateTime.time();
+        this.to = toDateTime.date();
+        this.toTime = toDateTime.time();
     }
 
     @Override
     public String toFileFormat() {
-        return "E | " + getDoneFlag() + " | " + getDescription() + " | " + from + " | " + to;
+        return "E | " + getDoneFlag() + " | " + getDescription() + " | "
+                + DateTimeParser.formatForStorage(from, fromTime) + " | "
+                + DateTimeParser.formatForStorage(to, toTime);
     }
 
     @Override
     public String toString() {
         return "[Event]" + super.toString() + " (from: "
-                + DateTimeParser.formatForDisplay(this.from) + ", to: "
-                + DateTimeParser.formatForDisplay(this.to) + ")";
+                + DateTimeParser.formatForDisplay(from, fromTime) + ", to: "
+                + DateTimeParser.formatForDisplay(to, toTime) + ")";
     }
 }

@@ -25,6 +25,8 @@ public final class DateTimeParser {
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm")
                     .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter STORAGE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
     private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("MMM d uuuu", Locale.ENGLISH);
     private static final DateTimeFormatter DISPLAY_TIME_FORMATTER =
@@ -44,34 +46,33 @@ public final class DateTimeParser {
     }
 
     /**
-     * Formats a supported task date for display, retaining unsupported legacy text unchanged.
+     * Parses a date with an optional 24-hour time into Java time values.
      *
-     * @param value stored task date
-     * @return formatted date text
+     * @param value date, or date and time, entered by the user
+     * @return parsed date and optional time
+     * @throws DateTimeParseException if the value has an unsupported shape or is invalid
      */
-    public static String formatForDisplay(String value) {
-        try {
-            if (value.matches(DATE_TIME_PATTERN)) {
-                LocalDateTime dateTime = LocalDateTime.parse(value, INPUT_DATE_TIME_FORMATTER);
-                return formatDate(dateTime.toLocalDate()) + ", " + formatTime(dateTime.toLocalTime());
-            }
-            return formatDate(LocalDate.parse(value, INPUT_DATE_FORMATTER));
-        } catch (DateTimeParseException | NullPointerException exception) {
-            return value;
-        }
-    }
-
-    /** Parses a value according to the date-only or date-time format. */
-    private static void parse(String value) throws DateTimeParseException {
+    public static DateTimeValue parse(String value) throws DateTimeParseException {
         if (value.matches(DATE_TIME_PATTERN)) {
-            LocalDateTime.parse(value, INPUT_DATE_TIME_FORMATTER);
-            return;
+            LocalDateTime dateTime = LocalDateTime.parse(value, INPUT_DATE_TIME_FORMATTER);
+            return new DateTimeValue(dateTime.toLocalDate(), dateTime.toLocalTime());
         }
         if (value.matches(DATE_PATTERN)) {
-            LocalDate.parse(value, INPUT_DATE_FORMATTER);
-            return;
+            return new DateTimeValue(LocalDate.parse(value, INPUT_DATE_FORMATTER), null);
         }
         throw new DateTimeParseException("Unsupported date-time format", value, 0);
+    }
+
+    /** Formats parsed date and optional time values for task-list display. */
+    public static String formatForDisplay(LocalDate date, LocalTime time) {
+        String dateText = formatDate(date);
+        return time == null ? dateText : dateText + ", " + formatTime(time);
+    }
+
+    /** Formats parsed values in the canonical format used by task persistence. */
+    public static String formatForStorage(LocalDate date, LocalTime time) {
+        String dateText = date.format(INPUT_DATE_FORMATTER);
+        return time == null ? dateText : dateText + " " + time.format(STORAGE_TIME_FORMATTER);
     }
 
     /** Formats a date without a time component. */
@@ -83,5 +84,18 @@ public final class DateTimeParser {
     private static String formatTime(LocalTime time) {
         String meridiem = time.getHour() < 12 ? "am" : "pm";
         return time.format(DISPLAY_TIME_FORMATTER) + meridiem;
+    }
+
+    /** Holds a parsed date and its optional time component. */
+    public record DateTimeValue(LocalDate date, LocalTime time) {
+        /** Formats this value for task-list display. */
+        public String formatForDisplay() {
+            return DateTimeParser.formatForDisplay(date, time);
+        }
+
+        /** Formats this value for task-list persistence. */
+        public String formatForStorage() {
+            return DateTimeParser.formatForStorage(date, time);
+        }
     }
 }
