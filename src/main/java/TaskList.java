@@ -1,15 +1,36 @@
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Stores tasks in insertion order and provides one-based lookup.
  */
 public class TaskList {
+    /** File used to persist tasks, relative to the project root. */
+    private static final Path DEFAULT_FILE_PATH = Paths.get(".", "data", "echo.txt");
+
     /** The tasks currently in the user's list. */
     private final List<Task> tasks = new ArrayList<>();
+    private final Path filePath;
 
-    /** Creates an empty task list. */
+    /** Creates a task list and loads any previously saved tasks. */
     public TaskList() {
+        this(DEFAULT_FILE_PATH);
+    }
+
+    /**
+     * Creates a task list backed by a specific file.
+     *
+     * @param filePath file to load from and save to
+     */
+    public TaskList(Path filePath) {
+        this.filePath = filePath;
+        load();
     }
 
     /**
@@ -19,6 +40,7 @@ public class TaskList {
      */
     public void addTask(Task task) {
         tasks.add(task);
+        save();
     }
 
     /**
@@ -28,7 +50,9 @@ public class TaskList {
      * @return the removed task
      */
     public Task removeTask(int taskNumber) {
-        return tasks.remove(taskNumber - 1);
+        Task removedTask = tasks.remove(taskNumber - 1);
+        save();
+        return removedTask;
     }
 
     /**
@@ -67,5 +91,90 @@ public class TaskList {
      */
     public boolean isEmpty() {
         return tasks.isEmpty();
+    }
+
+    /**
+     * Saves all current tasks, replacing the previous contents of the file.
+     *
+     * @throws UncheckedIOException if the file cannot be written
+     */
+    public void save() {
+        List<String> lines = tasks.stream()
+                .map(Task::toFileFormat)
+                .toList();
+
+        try {
+            Path parent = filePath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.write(filePath, lines, StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to save tasks to " + filePath, exception);
+        }
+    }
+
+    /** Loads saved tasks if a persistence file already exists. */
+    private void load() {
+        if (!Files.exists(filePath)) {
+            return;
+        }
+
+        try {
+            for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
+                loadTask(line);
+            }
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to load tasks from " + filePath, exception);
+        }
+    }
+
+    /** Creates and adds one task from a saved line. */
+    private void loadTask(String line) {
+        String[] fields = line.split("\\s*\\|\\s*", -1);
+        if (fields.length < 3) {
+            return;
+        }
+
+        String description = fields[2];
+        Task task;
+        switch (fields[0]) {
+        case "T":
+            task = new TodoTask(description);
+            break;
+        case "D":
+            if (fields.length < 4) {
+                return;
+            }
+            task = new DeadlineTask(description, fields[3]);
+            break;
+        case "E":
+            if (fields.length < 4) {
+                return;
+            }
+
+            String from;
+            String to;
+            if (fields.length >= 5) {
+                // Accept the previous five-field format while saving the new four-field format.
+                from = fields[3];
+                to = fields[4];
+            } else {
+                String eventDetails = fields[3];
+                int separator = eventDetails.lastIndexOf(' ');
+                from = separator < 0 ? eventDetails : eventDetails.substring(0, separator);
+                to = separator < 0 ? "" : eventDetails.substring(separator + 1);
+            }
+
+            task = new EventTask(description, from, to);
+            break;
+        default:
+            return;
+        }
+
+        if ("1".equals(fields[1])) {
+            task.mark();
+        }
+        tasks.add(task);
     }
 }
