@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * Provides the task operations used by E.C.H.O.
  */
@@ -80,6 +82,15 @@ public class TaskManager {
      */
     public boolean isEmpty() {
         return taskList.isEmpty();
+    }
+
+    /**
+     * Returns a read-only snapshot of the tasks in insertion order.
+     *
+     * @return Immutable task snapshot.
+     */
+    public List<Task> getTasks() {
+        return taskList.asList();
     }
 
     /**

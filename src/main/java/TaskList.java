@@ -97,6 +97,15 @@ public class TaskList {
     }
 
     /**
+     * Returns a read-only snapshot of the tasks in insertion order.
+     *
+     * @return Immutable task snapshot.
+     */
+    public List<Task> asList() {
+        return List.copyOf(tasks);
+    }
+
+    /**
      * Saves all current tasks, replacing the previous contents of the file.
      *
      * @throws UncheckedIOException If the file cannot be written.
