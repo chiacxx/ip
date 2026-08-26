@@ -19,12 +19,6 @@ public class ParsedCommand extends Command {
     @Override
     public void execute(TaskManager taskManager, Ui ui) throws EchoException {
         switch (getType()) {
-        case HELP:
-            ui.showHelp();
-            return;
-        case LIST:
-            ui.showTaskList(taskManager.getTasks());
-            return;
         case TODO:
             ui.showAdded(taskManager.addTodo(getArgument(0)), taskManager.size());
             return;

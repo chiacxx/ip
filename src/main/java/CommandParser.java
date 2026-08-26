@@ -64,7 +64,11 @@ public class CommandParser {
             throw new EchoException(errorMessage);
         }
 
-        return new ParsedCommand(type, List.of());
+        return switch (type) {
+        case HELP -> new HelpCommand();
+        case LIST -> new ListCommand();
+        default -> new ParsedCommand(type, List.of());
+        };
     }
 
     /** Parses the command that ends the current session. */

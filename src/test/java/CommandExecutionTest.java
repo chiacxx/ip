@@ -15,5 +15,12 @@ public class CommandExecutionTest {
                 throw new AssertionError("Unexpected bye error: " + exception.getMessage());
             }
         }
+
+        if (!(new CommandParser().parse("help") instanceof HelpCommand)) {
+            throw new AssertionError("help should create a HelpCommand");
+        }
+        if (!(new CommandParser().parse("list") instanceof ListCommand)) {
+            throw new AssertionError("list should create a ListCommand");
+        }
     }
 }
