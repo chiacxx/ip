@@ -3,27 +3,33 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Parses raw user input into validated Command objects.
+ * Converts raw user input into validated {@link Command} objects.
  */
 public class CommandParser {
+    /** Usage guidance for todo commands. */
     private static final String TODO_FORMAT = "Try: todo <description>.";
+    /** Placeholder text for a date and optional time in usage guidance. */
     private static final String DATE_TIME_ARGUMENT = "<" + DateTimeParser.DATE_FORMAT + "> ["
             + DateTimeParser.TIME_FORMAT + "]";
+    /** Usage guidance for deadline commands. */
     private static final String DEADLINE_FORMAT = "Try: deadline <description> /by "
             + DATE_TIME_ARGUMENT + ".";
+    /** Usage guidance for event commands. */
     private static final String EVENT_FORMAT = "Try: event <description> /from "
             + DATE_TIME_ARGUMENT + " /to " + DATE_TIME_ARGUMENT + ".";
 
-    /** Creates a parser for E.C.H.O. commands. */
+    /**
+     * Creates a parser for E.C.H.O. commands.
+     */
     public CommandParser() {
     }
 
     /**
      * Parses one line of user input.
      *
-     * @param input raw input line
-     * @return validated command
-     * @throws EchoException if the input is not a supported command
+     * @param input Raw input line.
+     * @return Validated command.
+     * @throws EchoException If the input is not a supported command.
      */
     public Command parse(String input) throws EchoException {
         String trimmedInput = input.trim();
@@ -52,7 +58,7 @@ public class CommandParser {
         };
     }
 
-    /** Parses a command that accepts no arguments. */
+    /** Parses a command that does not accept arguments. */
     private Command parseNoArgumentCommand(String[] commandParts, Command.Type type,
                                            String errorMessage) throws EchoException {
         if (commandParts.length != 1) {
@@ -62,7 +68,7 @@ public class CommandParser {
         return new Command(type, List.of());
     }
 
-    /** Parses a command that accepts 1 argument (task number):mark, unmark, or delete. */
+    /** Parses a task command with one task-number argument. */
     private Command parseTaskNumberCommand(String[] commandParts, Command.Type type)
             throws EchoException {
         String commandName = switch (type) {
@@ -91,7 +97,7 @@ public class CommandParser {
         return new Command(type, List.of(String.valueOf(taskNumber)));
     }
 
-    /** Parses a todo and keeps its complete description as one argument. */
+    /** Parses a todo command and keeps its complete description as one argument. */
     private Command parseTodoCommand(String input) throws EchoException {
         String description = getCommandContent(input);
         if (description.isEmpty()) {
@@ -100,7 +106,7 @@ public class CommandParser {
         return new Command(Command.Type.TODO, List.of(description));
     }
 
-    /** Parses a deadline with a date and optional time after '/by'. */
+    /** Parses a deadline command with a date and optional time after {@code /by}. */
     private Command parseDeadlineCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -139,7 +145,7 @@ public class CommandParser {
         return new Command(Command.Type.DEADLINE, List.of(description, dueDate));
     }
 
-    /** Parses an event with dates and optional times after '/from' and '/to'. */
+    /** Parses an event command with dates and optional times after {@code /from} and {@code /to}. */
     private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -204,7 +210,7 @@ public class CommandParser {
     }
 
 
-    /** Checks for a field marker such as /by, ignoring letter case. */
+    /** Checks for a field marker such as {@code /by}, ignoring letter case. */
     private static boolean containsMarker(String content, String marker) {
         return content.toLowerCase(Locale.ROOT).contains(marker.toLowerCase(Locale.ROOT));
     }

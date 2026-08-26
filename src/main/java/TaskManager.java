@@ -2,9 +2,12 @@
  * Provides the task operations used by E.C.H.O.
  */
 public class TaskManager {
+    /** The task list used to store and persist tasks. */
     private final TaskList taskList;
 
-    /** Creates a task manager using the default persistent task list. */
+    /**
+     * Creates a task manager using the default persistent task list.
+     */
     public TaskManager() {
         this(new TaskList());
     }
@@ -12,7 +15,7 @@ public class TaskManager {
     /**
      * Creates a task manager using the supplied task list.
      *
-     * @param taskList task list used by this manager
+     * @param taskList Task list used by this manager.
      */
     public TaskManager(TaskList taskList) {
         this.taskList = taskList;
@@ -21,8 +24,8 @@ public class TaskManager {
     /**
      * Creates and stores a todo task.
      *
-     * @param description task description
-     * @return the new task
+     * @param description Task description.
+     * @return The new task.
      */
     public Task addTodo(String description) {
         return addTask(new TodoTask(description));
@@ -31,9 +34,9 @@ public class TaskManager {
     /**
      * Creates and stores a deadline task.
      *
-     * @param description task description
-     * @param by deadline date with an optional time
-     * @return the new task
+     * @param description Task description.
+     * @param by Due date with an optional time.
+     * @return The new task.
      */
     public Task addDeadline(String description, String by) {
         return addTask(new DeadlineTask(description, by));
@@ -42,10 +45,10 @@ public class TaskManager {
     /**
      * Creates and stores an event task.
      *
-     * @param description event description
-     * @param from event start date with an optional time
-     * @param to event end date with an optional time
-     * @return the new task
+     * @param description Event description.
+     * @param from Event start date with an optional time.
+     * @param to Event end date with an optional time.
+     * @return The new task.
      */
     public Task addEvent(String description, String from, String to) {
         return addTask(new EventTask(description, from, to));
@@ -54,8 +57,8 @@ public class TaskManager {
     /**
      * Returns a task at a one-based task-list position.
      *
-     * @param taskNumber one-based task number
-     * @return task at that position
+     * @param taskNumber One-based task number.
+     * @return Task at that position.
      */
     public Task getTask(int taskNumber) {
         return taskList.getTask(taskNumber);
@@ -64,7 +67,7 @@ public class TaskManager {
     /**
      * Returns the number of tasks currently stored.
      *
-     * @return number of tasks
+     * @return Number of tasks.
      */
     public int size() {
         return taskList.size();
@@ -73,7 +76,7 @@ public class TaskManager {
     /**
      * Checks whether no tasks have been added.
      *
-     * @return whether the task list is empty
+     * @return Whether the task list is empty.
      */
     public boolean isEmpty() {
         return taskList.isEmpty();
@@ -82,9 +85,9 @@ public class TaskManager {
     /**
      * Marks a task as done.
      *
-     * @param taskNumber one-based task number
-     * @return the marked task
-     * @throws EchoException if the task number is unavailable
+     * @param taskNumber One-based task number.
+     * @return The marked task.
+     * @throws EchoException If the task number is unavailable.
      */
     public Task markTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
@@ -96,9 +99,9 @@ public class TaskManager {
     /**
      * Marks a task as not done.
      *
-     * @param taskNumber one-based task number
-     * @return the unmarked task
-     * @throws EchoException if the task number is unavailable
+     * @param taskNumber One-based task number.
+     * @return The unmarked task.
+     * @throws EchoException If the task number is unavailable.
      */
     public Task unmarkTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
@@ -110,9 +113,9 @@ public class TaskManager {
     /**
      * Removes a task from the task list.
      *
-     * @param taskNumber one-based task number
-     * @return the removed task
-     * @throws EchoException if the task number is unavailable
+     * @param taskNumber One-based task number.
+     * @return The removed task.
+     * @throws EchoException If the task number is unavailable.
      */
     public Task deleteTask(int taskNumber) throws EchoException {
         requireTask(taskNumber);

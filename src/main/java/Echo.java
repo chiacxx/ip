@@ -3,14 +3,20 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * E.C.H.O. - Everyday Conversational &amp; Helpful Operator.
+ * Provides the command-line interface for E.C.H.O., the Everyday Conversational
+ * and Helpful Operator.
  */
 public class Echo {
+    /** Horizontal line used to frame E.C.H.O. responses. */
     private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
+    /** Prompt displayed while waiting for user input. */
     private static final String PROMPT = "E.C.H.O. ❯ ";
+    /** Indentation applied to each response line. */
     private static final String RESPONSE_INDENT = "  ";
+    /** Maximum response content width before a line is wrapped. */
     private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
 
+    /** Help text describing the commands supported by E.C.H.O. */
     private static final String HELP_MESSAGE = """
             Available operations:
               help                                         Show this help message
@@ -25,6 +31,7 @@ public class Echo {
 
             Task numbers are shown by the 'list' command.""";
 
+    /** Startup banner displayed when an E.C.H.O. session begins. */
     private static final String BANNER = """
        ______ _____ _   _  ____  \s
       |  ____/ ____| | | |/ __ \\ \s
@@ -34,33 +41,39 @@ public class Echo {
       |______\\_____|_| |_|\\____/ \s
       """;
 
+    /** Farewell messages selected randomly when a session ends. */
     private static final List<String> FAREWELL_FLAVORS = List.of(
             "Signal fading... E.C.H.O. signing off. Take care!",
             "Powering down the transmitter. Catch you soon!",
             "Going dark now. Thanks for the chat!"
     );
 
+    /** Random generator used to select a farewell message. */
     private static final Random RANDOM = new Random();
 
+    /** Parser for converting user input into commands. */
     private final CommandParser commandParser;
+    /** Manager for task operations and persistence. */
     private final TaskManager taskManager;
 
-    /** Creates a new E.C.H.O. session with tasks loaded from local storage. */
+    /**
+     * Creates a new E.C.H.O. session with tasks loaded from local storage.
+     */
     public Echo() {
         this.commandParser = new CommandParser();
         this.taskManager = new TaskManager();
     }
 
     /**
-     * Main driver to start an E.C.H.O. session.
+     * Starts an E.C.H.O. session.
      *
-     * @param args command-line arguments, currently unused
+     * @param args Command-line arguments, which are currently unused.
      */
     public static void main(String[] args) {
         new Echo().run();
     }
 
-    /** Reads and processes inputs until the user disconnects or input ends. */
+    /** Reads and processes input until the user disconnects or input ends. */
     private void run() {
         System.out.println(BANNER);
         printBotResponse("Signal established. Online and listening!\nType 'help' to view list of operations!");
@@ -93,9 +106,9 @@ public class Echo {
     /**
      * Executes a validated command.
      *
-     * @param command Validated command
-     * @return Whether the session should end
-     * @throws EchoException if the command refers to a task that does not exist
+     * @param command Validated command.
+     * @return Whether the session should end.
+     * @throws EchoException If the command refers to a task that does not exist.
      */
     private boolean execute(Command command) throws EchoException {
         switch (command.getType()) {

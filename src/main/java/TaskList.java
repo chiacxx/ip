@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Stores tasks in insertion order and provides one-based lookup.
+ * Stores tasks in insertion order, provides one-based lookup, and persists them.
  */
 public class TaskList {
     /** File used to persist tasks, relative to the project root. */
@@ -16,9 +16,12 @@ public class TaskList {
 
     /** The tasks currently in the user's list. */
     private final List<Task> tasks = new ArrayList<>();
+    /** The file used to load and save this task list. */
     private final Path filePath;
 
-    /** Creates a task list and loads any previously saved tasks. */
+    /**
+     * Creates a task list and loads any previously saved tasks.
+     */
     public TaskList() {
         this(DEFAULT_FILE_PATH);
     }
@@ -26,7 +29,7 @@ public class TaskList {
     /**
      * Creates a task list backed by a specific file.
      *
-     * @param filePath file to load from and save to
+     * @param filePath File to load from and save to.
      */
     public TaskList(Path filePath) {
         this.filePath = filePath;
@@ -36,7 +39,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task task to add
+     * @param task Task to add.
      */
     public void addTask(Task task) {
         tasks.add(task);
@@ -46,8 +49,8 @@ public class TaskList {
     /**
      * Removes and returns a task using its one-based task number.
      *
-     * @param taskNumber one-based task number
-     * @return the removed task
+     * @param taskNumber One-based task number.
+     * @return The removed task.
      */
     public Task removeTask(int taskNumber) {
         Task removedTask = tasks.remove(taskNumber - 1);
@@ -58,8 +61,8 @@ public class TaskList {
     /**
      * Returns a task using its one-based task number.
      *
-     * @param taskNumber one-based task number
-     * @return task at that position
+     * @param taskNumber One-based task number.
+     * @return Task at that position.
      */
     public Task getTask(int taskNumber) {
         return tasks.get(taskNumber - 1);
@@ -68,8 +71,8 @@ public class TaskList {
     /**
      * Checks whether a task number is available.
      *
-     * @param taskNumber one-based task number
-     * @return whether the task exists
+     * @param taskNumber One-based task number.
+     * @return Whether the task exists.
      */
     public boolean hasTask(int taskNumber) {
         return taskNumber >= 1 && taskNumber <= tasks.size();
@@ -78,7 +81,7 @@ public class TaskList {
     /**
      * Returns the number of stored tasks.
      *
-     * @return number of stored tasks
+     * @return Number of stored tasks.
      */
     public int size() {
         return tasks.size();
@@ -87,7 +90,7 @@ public class TaskList {
     /**
      * Checks whether the list contains no tasks.
      *
-     * @return whether the list is empty
+     * @return Whether the list is empty.
      */
     public boolean isEmpty() {
         return tasks.isEmpty();
@@ -96,7 +99,7 @@ public class TaskList {
     /**
      * Saves all current tasks, replacing the previous contents of the file.
      *
-     * @throws UncheckedIOException if the file cannot be written
+     * @throws UncheckedIOException If the file cannot be written.
      */
     public void save() {
         List<String> lines = tasks.stream()
