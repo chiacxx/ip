@@ -9,7 +9,8 @@ import echo.util.DateTimeParser;
 /**
  * Converts raw user input into validated {@link Command} objects.
  */
-public class CommandParser {
+public class
+CommandParser {
     /** Usage guidance for todo commands. */
     private static final String TODO_FORMAT = "Try: todo <description>.";
     /** Placeholder text for a date and optional time in usage guidance. */
