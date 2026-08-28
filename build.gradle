@@ -50,7 +50,7 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = 'duke.jar'
+    archiveFileName = 'echo.jar'
 }
 
 run {
