@@ -13,12 +13,15 @@ public class
 CommandParser {
     /** Usage guidance for todo commands. */
     private static final String TODO_FORMAT = "Try: todo <description>.";
+
     /** Placeholder text for a date and optional time in usage guidance. */
     private static final String DATE_TIME_ARGUMENT = "<" + DateTimeParser.DATE_FORMAT + "> ["
             + DateTimeParser.TIME_FORMAT + "]";
+
     /** Usage guidance for deadline commands. */
     private static final String DEADLINE_FORMAT = "Try: deadline <description> /by "
             + DATE_TIME_ARGUMENT + ".";
+
     /** Usage guidance for event commands. */
     private static final String EVENT_FORMAT = "Try: event <description> /from "
             + DATE_TIME_ARGUMENT + " /to " + DATE_TIME_ARGUMENT + ".";
@@ -56,10 +59,20 @@ CommandParser {
             case "mark" -> parseTaskNumberCommand(commandParts, Command.Type.MARK);
             case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
             case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
+            case "find" -> parseFindCommand(commandParts);
             case "bye" -> parseExitCommand(commandParts);
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
         };
+    }
+
+    /** Parses a find command. */
+    private Command parseFindCommand(String[] commandParts) throws EchoException {
+        if (commandParts.length != 2) {
+            throw new EchoException("Please provide exactly one keyword. Use 'find <keyword>'.");
+        }
+
+        return new FindCommand(commandParts[1]);
     }
 
     /** Parses a command that does not accept arguments. */

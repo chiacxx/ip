@@ -14,9 +14,10 @@ import echo.task.Task;
  */
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
-    private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
+    private static final String SEPARATOR = "-----------------------------------------------------------------------------------";
+
     /** Prompt displayed while waiting for user input. */
-    private static final String PROMPT = "E.C.H.O. ❯ ";
+    private static final String PROMPT = "E.C.H.O. >> ";
     /** Indentation applied to each response line. */
     private static final String RESPONSE_INDENT = "  ";
     /** Maximum response content width before a line is wrapped. */
@@ -33,6 +34,7 @@ public class Ui implements AutoCloseable {
               mark <number>                                Mark a task as done
               unmark <number>                              Mark a task as not done
               delete <number>                              Remove a task
+              find <keyword>                               Find tasks by keyword
               bye                                          Disconnect from E.C.H.O.
 
             Task numbers are shown by the 'list' command.""";

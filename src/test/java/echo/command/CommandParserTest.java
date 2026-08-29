@@ -31,6 +31,21 @@ public class CommandParserTest {
     }
 
     @Test
+    public void parse_findInput_returnsFindCommandWithKeyword() throws EchoException {
+        Command command = parser.parse("find book");
+
+        assertInstanceOf(FindCommand.class, command);
+        assertEquals(Command.Type.FIND, command.getType());
+        assertEquals("book", command.getArgument(0));
+    }
+
+    @Test
+    public void parse_findInputWithoutExactlyOneKeyword_exceptionThrown() {
+        assertParseErrorContaining("find", "exactly one keyword");
+        assertParseErrorContaining("find read book", "exactly one keyword");
+    }
+
+    @Test
     public void parse_todoInput_returnsTodoCommandWithCompleteDescription() throws EchoException {
         Command command = parser.parse("todo read book");
 

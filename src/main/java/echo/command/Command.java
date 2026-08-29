@@ -30,6 +30,8 @@ public abstract class Command {
         UNMARK,
         /** Deletes a task. */
         DELETE,
+        /** Finds by keyword. */
+        FIND,
         /** Ends the session. */
         BYE
     }
