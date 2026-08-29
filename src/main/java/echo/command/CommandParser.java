@@ -9,8 +9,7 @@ import echo.util.DateTimeParser;
 /**
  * Converts raw user input into validated {@link Command} objects.
  */
-public class
-CommandParser {
+public class CommandParser {
     /** Usage guidance for todo commands. */
     private static final String TODO_FORMAT = "Try: todo <description>.";
     /** Placeholder text for a date and optional time in usage guidance. */
@@ -64,15 +63,15 @@ CommandParser {
 
     /** Parses a command that does not accept arguments. */
     private Command parseNoArgumentCommand(String[] commandParts, Command.Type type,
-                                           String errorMessage) throws EchoException {
+            String errorMessage) throws EchoException {
         if (commandParts.length != 1) {
             throw new EchoException(errorMessage);
         }
 
         return switch (type) {
-        case HELP -> new HelpCommand();
-        case LIST -> new ListCommand();
-        default -> throw new IllegalArgumentException("Unsupported no-argument command: " + type);
+            case HELP -> new HelpCommand();
+            case LIST -> new ListCommand();
+            default -> throw new IllegalArgumentException("Unsupported no-argument command: " + type);
         };
     }
 
@@ -113,10 +112,10 @@ CommandParser {
         }
 
         return switch (type) {
-        case MARK -> new MarkCommand(taskNumber);
-        case UNMARK -> new UnmarkCommand(taskNumber);
-        case DELETE -> new DeleteCommand(taskNumber);
-        default -> throw new IllegalArgumentException("Unsupported task command: " + type);
+            case MARK -> new MarkCommand(taskNumber);
+            case UNMARK -> new UnmarkCommand(taskNumber);
+            case DELETE -> new DeleteCommand(taskNumber);
+            default -> throw new IllegalArgumentException("Unsupported task command: " + type);
         };
     }
 
@@ -172,11 +171,13 @@ CommandParser {
     private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
-            throw new EchoException("An event needs a description, start date, and end date. " + EVENT_FORMAT);
+            throw new EchoException(
+                    "An event needs a description, start date, and end date. " + EVENT_FORMAT);
         }
 
         if (!containsMarker(content, "/from")) {
-            throw new EchoException("An event must include a start date using '/from <date>'. " + EVENT_FORMAT);
+            throw new EchoException(
+                    "An event must include a start date using '/from <date>'. " + EVENT_FORMAT);
         }
 
         String[] partsFrom = content.split("(?i)\\s+/from\\s+", 2);

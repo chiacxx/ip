@@ -14,11 +14,15 @@ import echo.task.Task;
  */
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
-    private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
+    private static final String SEPARATOR = "────────────────────────────────────────"
+            + "─────────────────────────────────────────";
+
     /** Prompt displayed while waiting for user input. */
     private static final String PROMPT = "E.C.H.O. ❯ ";
+
     /** Indentation applied to each response line. */
     private static final String RESPONSE_INDENT = "  ";
+
     /** Maximum response content width before a line is wrapped. */
     private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
 
@@ -98,7 +102,11 @@ public class Ui implements AutoCloseable {
         showMessage(HELP_MESSAGE);
     }
 
-    /** Displays an error message. */
+    /**
+     * Displays an error message.
+     *
+     * @param message Error message to display.
+     */
     public void showError(String message) {
         showMessage(message);
     }
@@ -108,7 +116,11 @@ public class Ui implements AutoCloseable {
         showError("I could not load your saved tasks. Starting with an empty list.");
     }
 
-    /** Displays all tasks, or an empty-list message when there are no tasks. */
+    /**
+     * Displays all tasks, or an empty-list message when there are no tasks.
+     *
+     * @param tasks Tasks to display in insertion order.
+     */
     public void showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
             showMessage("List is empty!");
@@ -131,19 +143,35 @@ public class Ui implements AutoCloseable {
         showMessage(farewell);
     }
 
-    /** Displays the task created by a successful add command. */
+    /**
+     * Displays the task created by a successful add command.
+     *
+     * @param task Task that was created.
+     * @param totalTasks Total number of tasks after creation.
+     */
     public void showAdded(Task task, int totalTasks) {
         showMessage("Added the following task:\n  " + task
                 + "\nTotal tasks: " + totalTasks);
     }
 
-    /** Displays the result of marking or unmarking a task. */
-    public void showStatus(Task task, boolean marked) {
-        String action = marked ? "marked" : "unmarked";
+    /**
+     * Displays the result of marking or unmarking a task.
+     *
+     * @param task Task whose status changed.
+     * @param isMarked Whether the task is now marked as done.
+     */
+    public void showStatus(Task task, boolean isMarked) {
+        String action = isMarked ? "marked" : "unmarked";
         showMessage("Task " + action + " successfully:\n  " + task);
     }
 
-    /** Displays the removed task and the number of tasks remaining. */
+    /**
+     * Displays the removed task and the number of tasks remaining.
+     *
+     * @param taskNumber One-based number of the removed task.
+     * @param task Task that was removed.
+     * @param remainingTasks Total number of tasks after removal.
+     */
     public void showDeleted(int taskNumber, Task task, int remainingTasks) {
         showMessage("Successfully removed Task #" + taskNumber + ":\n  " + task
                 + "\nTotal tasks: " + remainingTasks);
@@ -185,10 +213,10 @@ public class Ui implements AutoCloseable {
         }
 
         String remaining = line;
-        boolean firstSegment = true;
+        boolean isFirstSegment = true;
 
         while (!remaining.isEmpty()) {
-            if (!firstSegment) {
+            if (!isFirstSegment) {
                 output.append("\n");
             }
 
@@ -197,7 +225,7 @@ public class Ui implements AutoCloseable {
 
             output.append(RESPONSE_INDENT).append(remaining, 0, breakAt);
             remaining = remaining.substring(breakAt).stripLeading();
-            firstSegment = false;
+            isFirstSegment = false;
         }
     }
 
