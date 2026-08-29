@@ -14,7 +14,9 @@ public class TaskManager {
     /** The storage used to persist task changes. */
     private final Storage storage;
 
-    /** Creates a task manager with an empty list and default storage. */
+    /**
+     * Creates a task manager with an empty list and default storage.
+     */
     public TaskManager() {
         this(new TaskList(), new Storage());
     }
@@ -22,7 +24,7 @@ public class TaskManager {
     /**
      * Creates a task manager using the supplied task list and default storage.
      *
-     * @param taskList Task list used by this manager.
+     * @param taskList task list used by this manager.
      */
     public TaskManager(TaskList taskList) {
         this(taskList, new Storage());
@@ -31,8 +33,8 @@ public class TaskManager {
     /**
      * Creates a task manager using the supplied task list and storage.
      *
-     * @param taskList Task list used by this manager.
-     * @param storage Storage used to save changes.
+     * @param taskList task list used by this manager.
+     * @param storage storage used to save changes.
      */
     public TaskManager(TaskList taskList, Storage storage) {
         this.taskList = taskList;
@@ -42,8 +44,8 @@ public class TaskManager {
     /**
      * Creates and stores a todo task.
      *
-     * @param description Task description.
-     * @return The new task.
+     * @param description task description.
+     * @return the new task.
      */
     public Task addTodo(String description) {
         return addTask(new TodoTask(description));
@@ -52,9 +54,9 @@ public class TaskManager {
     /**
      * Creates and stores a deadline task.
      *
-     * @param description Task description.
-     * @param by Due date with an optional time.
-     * @return The new task.
+     * @param description task description.
+     * @param by due date with an optional time.
+     * @return the new task.
      */
     public Task addDeadline(String description, String by) {
         return addTask(new DeadlineTask(description, by));
@@ -63,10 +65,10 @@ public class TaskManager {
     /**
      * Creates and stores an event task.
      *
-     * @param description Event description.
-     * @param from Event start date with an optional time.
-     * @param to Event end date with an optional time.
-     * @return The new task.
+     * @param description event description.
+     * @param from event start date with an optional time.
+     * @param to event end date with an optional time.
+     * @return the new task.
      */
     public Task addEvent(String description, String from, String to) {
         return addTask(new EventTask(description, from, to));
@@ -75,8 +77,8 @@ public class TaskManager {
     /**
      * Returns a task at a one-based task-list position.
      *
-     * @param taskNumber One-based task number.
-     * @return Task at that position.
+     * @param taskNumber one-based task number.
+     * @return task at that position.
      */
     public Task getTask(int taskNumber) {
         return taskList.getTask(taskNumber);
@@ -84,17 +86,13 @@ public class TaskManager {
 
     /**
      * Returns the number of tasks currently stored.
-     *
-     * @return Number of tasks.
      */
     public int size() {
         return taskList.size();
     }
 
     /**
-     * Checks whether no tasks have been added.
-     *
-     * @return Whether the task list is empty.
+     * Checks whether the task list is empty.
      */
     public boolean isEmpty() {
         return taskList.isEmpty();
@@ -103,7 +101,7 @@ public class TaskManager {
     /**
      * Returns a read-only snapshot of the tasks in insertion order.
      *
-     * @return Immutable task snapshot.
+     * @return immutable task snapshot.
      */
     public List<Task> getTasks() {
         return taskList.asList();
@@ -112,9 +110,9 @@ public class TaskManager {
     /**
      * Marks a task as done.
      *
-     * @param taskNumber One-based task number.
-     * @return The marked task.
-     * @throws EchoException If the task number is unavailable.
+     * @param taskNumber one-based task number.
+     * @return the marked task.
+     * @throws EchoException if the task number is unavailable.
      */
     public Task markTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
@@ -126,9 +124,9 @@ public class TaskManager {
     /**
      * Marks a task as not done.
      *
-     * @param taskNumber One-based task number.
-     * @return The unmarked task.
-     * @throws EchoException If the task number is unavailable.
+     * @param taskNumber one-based task number.
+     * @return the unmarked task.
+     * @throws EchoException if the task number is unavailable.
      */
     public Task unmarkTask(int taskNumber) throws EchoException {
         Task task = requireTask(taskNumber);
@@ -140,9 +138,9 @@ public class TaskManager {
     /**
      * Removes a task from the task list.
      *
-     * @param taskNumber One-based task number.
-     * @return The removed task.
-     * @throws EchoException If the task number is unavailable.
+     * @param taskNumber one-based task number.
+     * @return the removed task.
+     * @throws EchoException if the task number is unavailable.
      */
     public Task deleteTask(int taskNumber) throws EchoException {
         requireTask(taskNumber);

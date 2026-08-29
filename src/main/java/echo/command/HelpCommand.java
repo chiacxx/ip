@@ -4,15 +4,19 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Displays E.C.H.O.'s command guidance.
+ * Represents the help command to display list of commands.
  */
 public class HelpCommand extends Command {
-    /** Creates a help command without arguments. */
+    /**
+     * Creates a help command.
+     * */
     public HelpCommand() {
         super(Type.HELP, java.util.List.of());
     }
 
-    /** Displays the supported commands. */
+    /**
+     * Displays the supported commands.
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) {
         ui.showHelp();

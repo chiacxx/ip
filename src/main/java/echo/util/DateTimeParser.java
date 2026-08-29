@@ -49,8 +49,8 @@ public final class DateTimeParser {
     /**
      * Validates a date with an optional 24-hour time.
      *
-     * @param value Date, or date and time, entered by the user.
-     * @throws DateTimeParseException If the value has an unsupported shape or is invalid.
+     * @param value date, or date and time, entered by the user.
+     * @throws DateTimeParseException if the value has an unsupported shape or is invalid.
      */
     public static void validate(String value) throws DateTimeParseException {
         parse(value);
@@ -59,9 +59,9 @@ public final class DateTimeParser {
     /**
      * Parses a date with an optional 24-hour time into Java time values.
      *
-     * @param value Date, or date and time, entered by the user.
-     * @return Parsed date and optional time.
-     * @throws DateTimeParseException If the value has an unsupported shape or is invalid.
+     * @param value date, or date and time, entered by the user.
+     * @return parsed date and optional time.
+     * @throws DateTimeParseException if the value has an unsupported shape or is invalid.
      */
     public static DateTimeValue parse(String value) throws DateTimeParseException {
         if (value.matches(DATE_TIME_PATTERN)) {
@@ -77,9 +77,9 @@ public final class DateTimeParser {
     /**
      * Formats a date and optional time for display in the task list.
      *
-     * @param date Date to format.
-     * @param time Optional time to format.
-     * @return Formatted date, optionally followed by the formatted time.
+     * @param date date to format.
+     * @param time optional time to format.
+     * @return formatted date, optionally followed by the formatted time.
      */
     public static String formatForDisplay(LocalDate date, LocalTime time) {
         String dateText = formatDate(date);
@@ -89,9 +89,9 @@ public final class DateTimeParser {
     /**
      * Formats a date and optional time in the canonical persistence format.
      *
-     * @param date Date to format.
-     * @param time Optional time to format.
-     * @return Date and optional time in the persistence format.
+     * @param date date to format.
+     * @param time optional time to format.
+     * @return date and optional time in the persistence format.
      */
     public static String formatForStorage(LocalDate date, LocalTime time) {
         String dateText = date.format(INPUT_DATE_FORMATTER);
@@ -112,14 +112,14 @@ public final class DateTimeParser {
     /**
      * Holds a parsed date and its optional time component.
      *
-     * @param date Parsed date.
-     * @param time Optional time.
+     * @param date parsed date.
+     * @param time optional time.
      */
     public record DateTimeValue(LocalDate date, LocalTime time) {
         /**
          * Formats this value for display in the task list.
          *
-         * @return Formatted date, optionally followed by the formatted time.
+         * @return formatted date, optionally followed by the formatted time.
          */
         public String formatForDisplay() {
             return DateTimeParser.formatForDisplay(date, time);
@@ -128,7 +128,7 @@ public final class DateTimeParser {
         /**
          * Formats this value in the canonical persistence format.
          *
-         * @return Date and optional time in the persistence format.
+         * @return date and optional time in the persistence format.
          */
         public String formatForStorage() {
             return DateTimeParser.formatForStorage(date, time);

@@ -18,7 +18,7 @@ public class TaskList {
     /**
      * Creates a task list containing the supplied tasks.
      *
-     * @param tasks Initial tasks.
+     * @param tasks initial tasks.
      */
     public TaskList(List<Task> tasks) {
         this.tasks = new ArrayList<>(tasks);
@@ -27,7 +27,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task Task to add.
+     * @param task task to add.
      */
     public void addTask(Task task) {
         tasks.add(task);
@@ -36,8 +36,8 @@ public class TaskList {
     /**
      * Removes and returns a task using its one-based task number.
      *
-     * @param taskNumber One-based task number.
-     * @return The removed task.
+     * @param taskNumber one-based task number.
+     * @return the removed task.
      */
     public Task removeTask(int taskNumber) {
         return tasks.remove(taskNumber - 1);
@@ -46,8 +46,8 @@ public class TaskList {
     /**
      * Returns a task using its one-based task number.
      *
-     * @param taskNumber One-based task number.
-     * @return Task at that position.
+     * @param taskNumber one-based task number.
+     * @return task at that position.
      */
     public Task getTask(int taskNumber) {
         return tasks.get(taskNumber - 1);
@@ -56,8 +56,8 @@ public class TaskList {
     /**
      * Checks whether a task number is available.
      *
-     * @param taskNumber One-based task number.
-     * @return Whether the task exists.
+     * @param taskNumber one-based task number.
+     * @return whether the task exists.
      */
     public boolean hasTask(int taskNumber) {
         return taskNumber >= 1 && taskNumber <= tasks.size();
@@ -65,17 +65,13 @@ public class TaskList {
 
     /**
      * Returns the number of stored tasks.
-     *
-     * @return Number of tasks.
      */
     public int size() {
         return tasks.size();
     }
 
     /**
-     * Checks whether the list contains no tasks.
-     *
-     * @return Whether the task list is empty.
+     * Returns whether the list is empty.
      */
     public boolean isEmpty() {
         return tasks.isEmpty();
@@ -83,8 +79,6 @@ public class TaskList {
 
     /**
      * Returns a read-only snapshot of the tasks in insertion order.
-     *
-     * @return Immutable task snapshot.
      */
     public List<Task> asList() {
         return List.copyOf(tasks);

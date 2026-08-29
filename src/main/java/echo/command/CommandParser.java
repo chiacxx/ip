@@ -9,16 +9,19 @@ import echo.util.DateTimeParser;
 /**
  * Converts raw user input into validated {@link Command} objects.
  */
-public class
-CommandParser {
+public class CommandParser {
     /** Usage guidance for todo commands. */
     private static final String TODO_FORMAT = "Try: todo <description>.";
+
     /** Placeholder text for a date and optional time in usage guidance. */
+
     private static final String DATE_TIME_ARGUMENT = "<" + DateTimeParser.DATE_FORMAT + "> ["
             + DateTimeParser.TIME_FORMAT + "]";
+
     /** Usage guidance for deadline commands. */
     private static final String DEADLINE_FORMAT = "Try: deadline <description> /by "
             + DATE_TIME_ARGUMENT + ".";
+
     /** Usage guidance for event commands. */
     private static final String EVENT_FORMAT = "Try: event <description> /from "
             + DATE_TIME_ARGUMENT + " /to " + DATE_TIME_ARGUMENT + ".";
@@ -30,11 +33,11 @@ CommandParser {
     }
 
     /**
-     * Parses one line of user input.
+     * Parses one line of user input into an executable command.
      *
-     * @param input Raw input line.
-     * @return Validated command.
-     * @throws EchoException If the input is not a supported command.
+     * @param input raw input String line entered by the user.
+     * @return parsed and validated {@link Command} object.
+     * @throws EchoException if the input is not a supported command.
      */
     public Command parse(String input) throws EchoException {
         String trimmedInput = input.trim();
@@ -62,7 +65,15 @@ CommandParser {
         };
     }
 
-    /** Parses a command that does not accept arguments. */
+    /**
+     * Parses a command that accepts no additional arguments.
+     *
+     * @param commandParts split tokens of the user input.
+     * @param type the type of zero-argument command to instantiate.
+     * @param errorMessage the error message to present if extra arguments are detected.
+     * @return parsed and validated {@link Command} object.
+     * @throws EchoException if unexpected arguments are provided.
+     */
     private Command parseNoArgumentCommand(String[] commandParts, Command.Type type,
                                            String errorMessage) throws EchoException {
         if (commandParts.length != 1) {
@@ -76,7 +87,13 @@ CommandParser {
         };
     }
 
-    /** Parses the command that ends the current session. */
+    /**
+     * Parses the command that terminates the session.
+     *
+     * @param commandParts split tokens of the user input.
+     * @return {@link ExitCommand} object.
+     * @throws EchoException if unexpected arguments are provided.
+     */
     private Command parseExitCommand(String[] commandParts) throws EchoException {
         if (commandParts.length != 1) {
             throw new EchoException("'bye' does not take any arguments. "
@@ -86,7 +103,14 @@ CommandParser {
         return new ExitCommand();
     }
 
-    /** Parses a task command with one task-number argument. */
+    /**
+     * Parses a command that targets a specific task by its index.
+     *
+     * @param commandParts split tokens of the user input.
+     * @type the type of task-index command
+     * @return {@link ExitCommand} object.
+     * @throws EchoException if unexpected arguments are provided.
+     */
     private Command parseTaskNumberCommand(String[] commandParts, Command.Type type)
             throws EchoException {
         String commandName = switch (type) {
@@ -120,7 +144,13 @@ CommandParser {
         };
     }
 
-    /** Parses a todo command and keeps its complete description as one argument. */
+    /**
+     * Parses a todo command and extracts its task description.
+     *
+     * @param input raw user input starting with the todo keyword.
+     * @return {@link TodoCommand} object.
+     * @throws EchoException if the description is empty.
+     */
     private Command parseTodoCommand(String input) throws EchoException {
         String description = getCommandContent(input);
         if (description.isEmpty()) {
@@ -129,7 +159,13 @@ CommandParser {
         return new TodoCommand(description);
     }
 
-    /** Parses a deadline command with a date and optional time after {@code /by}. */
+    /**
+     * Parses a deadline command and extracts its task description and deadline.
+     *
+     * @param input raw user input starting with the deadline keyword.
+     * @return {@link DeadlineCommand} object.
+     * @throws EchoException if the description, delimiter, or date are empty or erroneous.
+     */
     private Command parseDeadlineCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -168,7 +204,13 @@ CommandParser {
         return new DeadlineCommand(description, dueDate);
     }
 
-    /** Parses an event command with dates and optional times after {@code /from} and {@code /to}. */
+    /**
+     * Parses an event command and extracts its task description, start date, and end date.
+     *
+     * @param input raw user input starting with the deadline keyword.
+     * @return {@link EventCommand} object.
+     * @throws EchoException if the description, delimiter, or date(s) are empty or erroneous.
+     */
     private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
@@ -214,7 +256,14 @@ CommandParser {
         return new EventCommand(description, startDate, endDate);
     }
 
-    /** Validates a date with an optional time and reports the expected format on failure. */
+    /**
+     * Validates date and optional time strings against expected formats.
+     *
+     * @param date date-time string to validate.
+     * @param fieldName descriptive name of the target field for error messaging.
+     * @param commandFormat suggested command usage format displayed on error.
+     * @throws EchoException if the date-time string does not match accepted format rules.
+     */
     private static void validateDateTime(String date, String fieldName, String commandFormat)
             throws EchoException {
         try {

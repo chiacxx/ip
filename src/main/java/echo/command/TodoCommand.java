@@ -6,19 +6,21 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Creates a todo task.
+ * Represents a todo task command.
  */
 public class TodoCommand extends TaskCreationCommand {
     /**
      * Creates a todo command.
      *
-     * @param description Todo description.
+     * @param description todo description.
      */
     public TodoCommand(String description) {
         super(Type.TODO, List.of(description));
     }
 
-    /** Creates and displays a todo task. */
+    /**
+     * Creates and displays a todo task.
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) {
         showAdded(taskManager.addTodo(getDescription()), taskManager, ui);

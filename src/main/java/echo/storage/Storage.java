@@ -24,15 +24,17 @@ public class Storage {
     /** File used to persist tasks. */
     private final Path filePath;
 
-    /** Creates storage using the application's default persistence file. */
+    /**
+     * Creates a new Storage instance using the application's default persistence file.
+     */
     public Storage() {
         this(DEFAULT_FILE_PATH);
     }
 
     /**
-     * Creates storage using a specific persistence file.
+     * Creates a new Storage instance using a given persistence filepath.
      *
-     * @param filePath File used to load and save tasks.
+     * @param filePath file used to load and save tasks.
      */
     public Storage(Path filePath) {
         this.filePath = filePath;
@@ -41,8 +43,8 @@ public class Storage {
     /**
      * Loads all valid tasks from the persistence file.
      *
-     * @return Tasks loaded from the file, in insertion order.
-     * @throws UncheckedIOException If the file cannot be read.
+     * @return tasks loaded from the file, in insertion order.
+     * @throws UncheckedIOException if the file cannot be read.
      */
     public List<Task> load() {
         if (!Files.exists(filePath)) {
@@ -66,8 +68,8 @@ public class Storage {
     /**
      * Saves all tasks, replacing the previous contents of the persistence file.
      *
-     * @param tasks Tasks to save.
-     * @throws UncheckedIOException If the file cannot be written.
+     * @param tasks tasks to save.
+     * @throws UncheckedIOException if the file cannot be written.
      */
     public void save(List<Task> tasks) {
         List<String> lines = tasks.stream()
@@ -85,7 +87,12 @@ public class Storage {
         }
     }
 
-    /** Creates one task from a saved line, or returns {@code null} if invalid. */
+    /**
+     * Creates one task from a saved line in the storage file.
+     *
+     * @param line String entry representing one task.
+     * @return {@link Task} object.
+     */
     private Task parseTask(String line) {
         String[] fields = line.split("\\s*\\|\\s*", -1);
         if (fields.length < 3) {
