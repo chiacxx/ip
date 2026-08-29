@@ -85,6 +85,26 @@ public class TaskManagerTest {
     }
 
     @Test
+    public void findByKeyword_returnsMatchingTasksInInsertionOrder() {
+        TaskManager manager = createManager();
+        Task firstMatch = manager.addTodo("read book");
+        manager.addTodo("submit report");
+        Task secondMatch = manager.addEvent("book club meeting", "01-10-2026", "02-10-2026");
+
+        List<Task> matchingTasks = manager.findByKeyword("book");
+
+        assertEquals(List.of(firstMatch, secondMatch), matchingTasks);
+    }
+
+    @Test
+    public void findByKeyword_withNoMatches_returnsEmptyList() {
+        TaskManager manager = createManager();
+        manager.addTodo("read book");
+
+        assertTrue(manager.findByKeyword("holiday").isEmpty());
+    }
+
+    @Test
     public void getTasks_returnsReadOnlySnapshot() {
         TaskManager manager = createManager();
         manager.addTodo("first task");

@@ -108,6 +108,15 @@ public class TaskManager {
     }
 
     /**
+     * Returns a list of tasks whose description contains the search keyword.
+     *
+     * @param keyword the keyword to search for.
+     */
+    public List<Task> findByKeyword(String keyword) {
+        return taskList.findByKeyword(keyword);
+    }
+
+    /**
      * Marks a task as done.
      *
      * @param taskNumber one-based task number.

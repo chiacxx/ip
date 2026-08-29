@@ -20,6 +20,9 @@ public abstract class Command {
         MARK,
         UNMARK,
         DELETE,
+        /** Finds by keyword. */
+        FIND,
+        /** Ends the session. */
         BYE
     }
 

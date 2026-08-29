@@ -59,10 +59,20 @@ public class CommandParser {
             case "mark" -> parseTaskNumberCommand(commandParts, Command.Type.MARK);
             case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
             case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
+            case "find" -> parseFindCommand(commandParts);
             case "bye" -> parseExitCommand(commandParts);
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
         };
+    }
+
+    /** Parses a find command. */
+    private Command parseFindCommand(String[] commandParts) throws EchoException {
+        if (commandParts.length != 2) {
+            throw new EchoException("Please provide exactly one keyword. Use 'find <keyword>'.");
+        }
+
+        return new FindCommand(commandParts[1]);
     }
 
     /**
