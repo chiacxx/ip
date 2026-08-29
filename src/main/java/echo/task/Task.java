@@ -13,7 +13,7 @@ public class Task {
     /**
      * Creates a new task that is initially not done.
      *
-     * @param description Task description.
+     * @param description task description.
      */
     public Task(String description) {
         this.description = description;
@@ -46,7 +46,7 @@ public class Task {
     /**
      * Returns this task in the format used by task-list persistence.
      *
-     * @return Serialized task data.
+     * @return serialised task data.
      */
     public String toFileFormat() {
         return "T | " + getDoneFlag() + " | " + description;
@@ -63,17 +63,15 @@ public class Task {
 
     /**
      * Returns the user-entered task description for subclasses.
-     *
-     * @return User-entered task description.
      */
     protected String getDescription() {
         return description;
     }
 
     /**
-     * Returns this task with its completion status and description.
+     * Returns the user-facing representation of this event task.
      *
-     * @return Formatted task description.
+     * @return formatted task description.
      */
     @Override
     public String toString() {

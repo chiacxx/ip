@@ -18,8 +18,8 @@ public class DeadlineTask extends Task {
     /**
      * Creates a deadline task.
      *
-     * @param description Task description.
-     * @param by Due date with an optional time.
+     * @param description task description.
+     * @param by due date with an optional time.
      */
     public DeadlineTask(String description, String by) {
         super(description);
@@ -28,22 +28,12 @@ public class DeadlineTask extends Task {
         this.byTime = dateTime.time();
     }
 
-    /**
-     * Returns this task in the format used by task-list persistence.
-     *
-     * @return Serialized deadline-task data.
-     */
     @Override
     public String toFileFormat() {
         return "D | " + getDoneFlag() + " | " + getDescription() + " | "
                 + DateTimeParser.formatForStorage(by, byTime);
     }
 
-    /**
-     * Returns the user-facing representation of this deadline task.
-     *
-     * @return Formatted deadline-task description.
-     */
     @Override
     public String toString() {
         return "[Deadline]" + super.toString() + " (by: "

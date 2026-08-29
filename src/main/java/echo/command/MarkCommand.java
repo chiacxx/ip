@@ -5,7 +5,7 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Marks a task as done.
+ * Represents the command to mark a task as completed.
  */
 public class MarkCommand extends TaskNumberCommand {
     /**
@@ -17,7 +17,9 @@ public class MarkCommand extends TaskNumberCommand {
         super(Type.MARK, taskNumber);
     }
 
-    /** Marks the selected task and displays the result. */
+    /**
+     * Marks the selected task and displays the result.
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) throws EchoException {
         ui.showStatus(taskManager.markTask(getTaskNumber()), true);

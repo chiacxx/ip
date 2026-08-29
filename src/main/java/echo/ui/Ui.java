@@ -8,9 +8,6 @@ import echo.task.Task;
 
 /**
  * Handles all command-line interaction for E.C.H.O.
- *
- * <p>This class owns input reading and response formatting. It does not parse
- * commands or modify tasks.</p>
  */
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
@@ -68,13 +65,15 @@ public class Ui implements AutoCloseable {
     /**
      * Creates an interface using the supplied input source.
      *
-     * @param scanner Input source used to read commands.
+     * @param scanner input source used to read commands.
      */
     public Ui(Scanner scanner) {
         this.scanner = scanner;
     }
 
-    /** Displays the startup banner and connection message. */
+    /**
+     * Displays the startup banner and connection message.
+     */
     public void showWelcome() {
         System.out.println(BANNER);
         showMessage("Signal established. Online and listening!\nType 'help' to view list of operations!");
@@ -83,7 +82,7 @@ public class Ui implements AutoCloseable {
     /**
      * Reads one trimmed command from the user.
      *
-     * @return The command, or {@code null} when input has ended.
+     * @return the command, or {@code null} when input has ended.
      */
     public String readCommand() {
         System.out.print(PROMPT);
@@ -93,22 +92,34 @@ public class Ui implements AutoCloseable {
         return scanner.nextLine().trim();
     }
 
-    /** Displays the available commands. */
+    /**
+     * Displays the available commands.
+     */
     public void showHelp() {
         showMessage(HELP_MESSAGE);
     }
 
-    /** Displays an error message. */
+    /**
+     * Displays an error message.
+     *
+     * @param message error message to be displayed.
+     */
     public void showError(String message) {
         showMessage(message);
     }
 
-    /** Displays a recoverable error that occurred while loading saved tasks. */
+    /**
+     * Displays a recoverable error that occurred while loading saved tasks.
+     */
     public void showLoadingError() {
         showError("I could not load your saved tasks. Starting with an empty list.");
     }
 
-    /** Displays all tasks, or an empty-list message when there are no tasks. */
+    /**
+     * Displays all tasks, or an empty-list message when there are no tasks.
+     *
+     * @param tasks list of tasks.
+     */
     public void showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
             showMessage("List is empty!");
@@ -125,25 +136,43 @@ public class Ui implements AutoCloseable {
         showMessage(response.toString().stripTrailing());
     }
 
-    /** Displays a randomly selected farewell message. */
+    /**
+     * Displays a randomly selected farewell message.
+     */
     public void showFarewell() {
         String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
         showMessage(farewell);
     }
 
-    /** Displays the task created by a successful add command. */
+    /**
+     * Displays the task created by a successful add command.
+     *
+     * @param task the new task created.
+     * @param totalTasks total number of tasks.
+     */
     public void showAdded(Task task, int totalTasks) {
         showMessage("Added the following task:\n  " + task
                 + "\nTotal tasks: " + totalTasks);
     }
 
-    /** Displays the result of marking or unmarking a task. */
+    /**
+     * Displays the result of marking or unmarking a task.
+     *
+     * @param task the task that has been marked or unmarked.
+     * @param marked whether the task is marked.
+     */
     public void showStatus(Task task, boolean marked) {
         String action = marked ? "marked" : "unmarked";
         showMessage("Task " + action + " successfully:\n  " + task);
     }
 
-    /** Displays the removed task and the number of tasks remaining. */
+    /**
+     * Displays the removed task and the number of tasks remaining.
+     *
+     * @param taskNumber task number of the removed task.
+     * @param task the task that has been removed.
+     * @param remainingTasks remaning number of tasks.
+     */
     public void showDeleted(int taskNumber, Task task, int remainingTasks) {
         showMessage("Successfully removed Task #" + taskNumber + ":\n  " + task
                 + "\nTotal tasks: " + remainingTasks);

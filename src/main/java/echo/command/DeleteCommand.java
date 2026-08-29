@@ -5,7 +5,7 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Deletes a task.
+ * Represents the command to delete a task based on index.
  */
 public class DeleteCommand extends TaskNumberCommand {
     /**
@@ -17,7 +17,9 @@ public class DeleteCommand extends TaskNumberCommand {
         super(Type.DELETE, taskNumber);
     }
 
-    /** Deletes the selected task and displays the result. */
+    /**
+     * Deletes the selected task and displays the result. *
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) throws EchoException {
         int taskNumber = getTaskNumber();

@@ -6,20 +6,22 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Creates a deadline task.
+ * Represents a deadline task command.
  */
 public class DeadlineCommand extends TaskCreationCommand {
     /**
      * Creates a deadline command.
      *
-     * @param description Deadline description.
-     * @param dueDate Validated deadline date.
+     * @param description deadline description.
+     * @param dueDate validated deadline date.
      */
     public DeadlineCommand(String description, String dueDate) {
         super(Type.DEADLINE, List.of(description, dueDate));
     }
 
-    /** Creates and displays a deadline task. */
+    /**
+     * Creates and displays a deadline task.
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) {
         showAdded(taskManager.addDeadline(getDescription(), getArgument(1)), taskManager, ui);

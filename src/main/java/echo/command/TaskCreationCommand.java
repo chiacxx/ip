@@ -13,8 +13,8 @@ public abstract class TaskCreationCommand extends Command {
     /**
      * Creates a task-creation command.
      *
-     * @param type Command type.
-     * @param arguments Validated task-creation arguments.
+     * @param type command type.
+     * @param arguments validated task-creation command arguments.
      */
     protected TaskCreationCommand(Type type, List<String> arguments) {
         super(type, arguments);
@@ -22,14 +22,14 @@ public abstract class TaskCreationCommand extends Command {
 
     /**
      * Returns the task description.
-     *
-     * @return Validated task description.
      */
     protected String getDescription() {
         return getArgument(0);
     }
 
-    /** Displays a newly created task using the supplied application services. */
+    /**
+     * Displays a newly created task using the supplied UI service.
+     */
     protected void showAdded(Task task, TaskManager taskManager, Ui ui) {
         ui.showAdded(task, taskManager.size());
     }

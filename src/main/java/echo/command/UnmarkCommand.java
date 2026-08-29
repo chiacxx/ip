@@ -5,7 +5,7 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Marks a task as not done.
+ * Represents the command to mark a task as undone.
  */
 public class UnmarkCommand extends TaskNumberCommand {
     /**
@@ -17,7 +17,9 @@ public class UnmarkCommand extends TaskNumberCommand {
         super(Type.UNMARK, taskNumber);
     }
 
-    /** Unmarks the selected task and displays the result. */
+    /**
+     * Unmarks the selected task and displays the result.
+     */
     @Override
     public void execute(TaskManager taskManager, Ui ui) throws EchoException {
         ui.showStatus(taskManager.unmarkTask(getTaskNumber()), false);
