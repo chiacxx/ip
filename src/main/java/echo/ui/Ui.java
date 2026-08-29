@@ -11,11 +11,15 @@ import echo.task.Task;
  */
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
-    private static final String SEPARATOR = "─────────────────────────────────────────────────────────────────────────────────";
+    private static final String SEPARATOR = "────────────────────────────────────────"
+            + "─────────────────────────────────────────";
+
     /** Prompt displayed while waiting for user input. */
     private static final String PROMPT = "E.C.H.O. ❯ ";
+
     /** Indentation applied to each response line. */
     private static final String RESPONSE_INDENT = "  ";
+
     /** Maximum response content width before a line is wrapped. */
     private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
 
@@ -158,11 +162,11 @@ public class Ui implements AutoCloseable {
     /**
      * Displays the result of marking or unmarking a task.
      *
-     * @param task the task that has been marked or unmarked.
-     * @param marked whether the task is marked.
+     * @param task Task whose status changed.
+     * @param isMarked Whether the task is now marked as done.
      */
-    public void showStatus(Task task, boolean marked) {
-        String action = marked ? "marked" : "unmarked";
+    public void showStatus(Task task, boolean isMarked) {
+        String action = isMarked ? "marked" : "unmarked";
         showMessage("Task " + action + " successfully:\n  " + task);
     }
 
@@ -214,10 +218,10 @@ public class Ui implements AutoCloseable {
         }
 
         String remaining = line;
-        boolean firstSegment = true;
+        boolean isFirstSegment = true;
 
         while (!remaining.isEmpty()) {
-            if (!firstSegment) {
+            if (!isFirstSegment) {
                 output.append("\n");
             }
 
@@ -226,7 +230,7 @@ public class Ui implements AutoCloseable {
 
             output.append(RESPONSE_INDENT).append(remaining, 0, breakAt);
             remaining = remaining.substring(breakAt).stripLeading();
-            firstSegment = false;
+            isFirstSegment = false;
         }
     }
 

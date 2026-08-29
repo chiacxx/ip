@@ -102,23 +102,23 @@ public class Storage {
         String description = fields[2];
         Task task;
         switch (fields[0]) {
-        case "T":
-            task = new TodoTask(description);
-            break;
-        case "D":
-            if (fields.length < 4) {
+            case "T":
+                task = new TodoTask(description);
+                break;
+            case "D":
+                if (fields.length < 4) {
+                    return null;
+                }
+                task = new DeadlineTask(description, fields[3]);
+                break;
+            case "E":
+                if (fields.length < 5) {
+                    return null;
+                }
+                task = new EventTask(description, fields[3], fields[4]);
+                break;
+            default:
                 return null;
-            }
-            task = new DeadlineTask(description, fields[3]);
-            break;
-        case "E":
-            if (fields.length < 5) {
-                return null;
-            }
-            task = new EventTask(description, fields[3], fields[4]);
-            break;
-        default:
-            return null;
         }
 
         if ("1".equals(fields[1])) {
