@@ -20,8 +20,8 @@ public class ExitCommand extends Command {
      * Displays a farewell message before the session ends.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        ui.showFarewell();
+    public String execute(TaskManager taskManager, Ui ui) {
+        return ui.showFarewell();
     }
 
     @Override

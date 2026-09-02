@@ -20,7 +20,7 @@ public class FindCommand extends Command {
      * Displays tasks whose descriptions contain the supplied keyword.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        ui.showTaskList(taskManager.findByKeyword(getArgument(0)));
+    public String execute(TaskManager taskManager, Ui ui) {
+        return ui.showTaskList(taskManager.findByKeyword(getArgument(0)));
     }
 }

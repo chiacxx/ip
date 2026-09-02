@@ -18,7 +18,7 @@ public class ListCommand extends Command {
      * Displays all tasks managed by E.C.H.O.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        ui.showTaskList(taskManager.getTasks());
+    public String execute(TaskManager taskManager, Ui ui) {
+        return ui.showTaskList(taskManager.getTasks());
     }
 }

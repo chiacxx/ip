@@ -21,8 +21,8 @@ public class DeleteCommand extends TaskNumberCommand {
      * Deletes the selected task and displays the result. *
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) throws EchoException {
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
         int taskNumber = getTaskNumber();
-        ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
+        return ui.showDeleted(taskNumber, taskManager.deleteTask(taskNumber), taskManager.size());
     }
 }

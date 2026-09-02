@@ -79,10 +79,21 @@ public class Ui implements AutoCloseable {
 
     /**
      * Displays the startup banner and connection message.
+     *
+     * @return the welcome message.
      */
-    public void showWelcome() {
+    public String showWelcome() {
         System.out.println(BANNER);
-        showMessage("Signal established. Online and listening!\nType 'help' to view list of operations!");
+        return showMessage(getWelcomeMessage());
+    }
+
+    /**
+     * Returns the startup welcome message.
+     *
+     * @return the welcome message.
+     */
+    public String getWelcomeMessage() {
+        return "Signal established. Online and listening!\nType 'help' to view list of operations!";
     }
 
     /**
@@ -100,36 +111,41 @@ public class Ui implements AutoCloseable {
 
     /**
      * Displays the available commands.
+     *
+     * @return the help message.
      */
-    public void showHelp() {
-        showMessage(HELP_MESSAGE);
+    public String showHelp() {
+        return showMessage(HELP_MESSAGE);
     }
 
     /**
      * Displays an error message.
      *
      * @param message error message to be displayed.
+     * @return the error message.
      */
-    public void showError(String message) {
-        showMessage(message);
+    public String showError(String message) {
+        return showMessage(message);
     }
 
     /**
      * Displays a recoverable error that occurred while loading saved tasks.
+     *
+     * @return the loading error message.
      */
-    public void showLoadingError() {
-        showError("I could not load your saved tasks. Starting with an empty list.");
+    public String showLoadingError() {
+        return showError("I could not load your saved tasks. Starting with an empty list.");
     }
 
     /**
      * Displays all tasks, or an empty-list message when there are no tasks.
      *
      * @param tasks list of tasks.
+     * @return the task list message.
      */
-    public void showTaskList(List<Task> tasks) {
+    public String showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
-            showMessage("List is empty!");
-            return;
+            return showMessage("List is empty!");
         }
 
         StringBuilder response = new StringBuilder("Your tasks:\n");
@@ -139,15 +155,17 @@ public class Ui implements AutoCloseable {
                     .append(tasks.get(i))
                     .append("\n");
         }
-        showMessage(response.toString().stripTrailing());
+        return showMessage(response.toString().stripTrailing());
     }
 
     /**
      * Displays a randomly selected farewell message.
+     *
+     * @return the farewell message.
      */
-    public void showFarewell() {
+    public String showFarewell() {
         String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
-        showMessage(farewell);
+        return showMessage(farewell);
     }
 
     /**
@@ -155,9 +173,10 @@ public class Ui implements AutoCloseable {
      *
      * @param task the new task created.
      * @param totalTasks total number of tasks.
+     * @return the task added message.
      */
-    public void showAdded(Task task, int totalTasks) {
-        showMessage("Added the following task:\n  " + task
+    public String showAdded(Task task, int totalTasks) {
+        return showMessage("Added the following task:\n  " + task
                 + "\nTotal tasks: " + totalTasks);
     }
 
@@ -166,10 +185,11 @@ public class Ui implements AutoCloseable {
      *
      * @param task Task whose status changed.
      * @param isMarked Whether the task is now marked as done.
+     * @return the status change message.
      */
-    public void showStatus(Task task, boolean isMarked) {
+    public String showStatus(Task task, boolean isMarked) {
         String action = isMarked ? "marked" : "unmarked";
-        showMessage("Task " + action + " successfully:\n  " + task);
+        return showMessage("Task " + action + " successfully:\n  " + task);
     }
 
     /**
@@ -178,9 +198,10 @@ public class Ui implements AutoCloseable {
      * @param taskNumber task number of the removed task.
      * @param task the task that has been removed.
      * @param remainingTasks remaning number of tasks.
+     * @return the task deleted message.
      */
-    public void showDeleted(int taskNumber, Task task, int remainingTasks) {
-        showMessage("Successfully removed Task #" + taskNumber + ":\n  " + task
+    public String showDeleted(int taskNumber, Task task, int remainingTasks) {
+        return showMessage("Successfully removed Task #" + taskNumber + ":\n  " + task
                 + "\nTotal tasks: " + remainingTasks);
     }
 
@@ -191,10 +212,11 @@ public class Ui implements AutoCloseable {
     }
 
     /** Prints a message using the standard E.C.H.O. response layout. */
-    private void showMessage(String message) {
+    private String showMessage(String message) {
         System.out.println(SEPARATOR);
         System.out.println(wrapResponse(message));
         System.out.println(SEPARATOR + "\n");
+        return message;
     }
 
     /** Wraps each response line so it fits within the separator width. */

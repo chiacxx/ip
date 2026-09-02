@@ -23,7 +23,7 @@ public class DeadlineCommand extends TaskCreationCommand {
      * Creates and displays a deadline task.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        showAdded(taskManager.addDeadline(getDescription(), getArgument(1)), taskManager, ui);
+    public String execute(TaskManager taskManager, Ui ui) {
+        return showAdded(taskManager.addDeadline(getDescription(), getArgument(1)), taskManager, ui);
     }
 }
