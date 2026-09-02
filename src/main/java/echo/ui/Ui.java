@@ -12,7 +12,8 @@ import echo.task.Task;
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
 
-    private static final String SEPARATOR = "-----------------------------------------------------------------------------------";
+    private static final String SEPARATOR = "----------------------------------------"
+            + "-------------------------------------------";
 
     /** Prompt displayed while waiting for user input. */
     private static final String PROMPT = "E.C.H.O. >> ";
@@ -47,7 +48,7 @@ public class Ui implements AutoCloseable {
       |  __|| |    |  _  | |  | |
       | |___| |____| | | | |__| |
       |______\\_____|_| |_|\\____/ \s
-      """;
+        """;
 
     /** Farewell messages selected randomly when a session ends. */
     private static final List<String> FAREWELL_FLAVORS = List.of(
