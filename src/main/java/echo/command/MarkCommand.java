@@ -21,7 +21,7 @@ public class MarkCommand extends TaskNumberCommand {
      * Marks the selected task and displays the result.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) throws EchoException {
-        ui.showStatus(taskManager.markTask(getTaskNumber()), true);
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
+        return ui.showStatus(taskManager.markTask(getTaskNumber()), true);
     }
 }

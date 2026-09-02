@@ -24,8 +24,8 @@ public class EventCommand extends TaskCreationCommand {
      * Creates and displays an event task.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        showAdded(taskManager.addEvent(getDescription(), getArgument(1), getArgument(2)),
+    public String execute(TaskManager taskManager, Ui ui) {
+        return showAdded(taskManager.addEvent(getDescription(), getArgument(1), getArgument(2)),
                 taskManager, ui);
     }
 }

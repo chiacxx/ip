@@ -11,7 +11,7 @@ import echo.task.TaskManager;
 import echo.ui.Ui;
 
 /**
- * Provides the command-line interface for E.C.H.O.
+ * Provides the core chatbot logic and session manager for E.C.H.O.
  */
 public class Echo {
     /** User interface for input and output. */
@@ -22,10 +22,12 @@ public class Echo {
     private final CommandParser commandParser;
     /** Manager for task operations and persistence. */
     private final TaskManager taskManager;
+    /** Flag indicating if an exit command has been received. */
+    private boolean isExit;
 
     /**
      * Creates a new E.C.H.O. session using the default storage file.
-     * */
+     */
     public Echo() {
         this(new Storage());
     }
@@ -70,7 +72,7 @@ public class Echo {
     }
 
     /**
-     * Starts an E.C.H.O. session.
+     * Starts an E.C.H.O. session in command-line mode.
      *
      * @param args command-line arguments, which are currently unused.
      */
@@ -79,7 +81,44 @@ public class Echo {
     }
 
     /**
-     * Main driver ot E.C.H.O., reading CLI inputs from user until termination.
+     * Generates a response for the user's chat message in GUI mode.
+     *
+     * @param input user chat input.
+     * @return response message string.
+     */
+    public String getResponse(String input) {
+        try {
+            Command command = commandParser.parse(input);
+            String response = command.execute(taskManager, ui);
+            if (command.isExit()) {
+                isExit = true;
+            }
+            return response;
+        } catch (EchoException exception) {
+            return exception.getMessage();
+        }
+    }
+
+    /**
+     * Returns the welcome message for E.C.H.O.
+     *
+     * @return startup welcome message.
+     */
+    public String getWelcomeMessage() {
+        return ui.getWelcomeMessage();
+    }
+
+    /**
+     * Returns whether the session has been terminated by an exit command.
+     *
+     * @return true if an exit command has been executed, false otherwise.
+     */
+    public boolean isExit() {
+        return isExit;
+    }
+
+    /**
+     * Main driver of E.C.H.O., reading CLI inputs from user until termination.
      */
     public void run() {
         ui.showWelcome();

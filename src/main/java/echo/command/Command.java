@@ -45,9 +45,10 @@ public abstract class Command {
      *
      * @param taskManager service used to perform task operations.
      * @param ui interface used to display results.
+     * @return response message resulting from command execution.
      * @throws EchoException if the command cannot be completed.
      */
-    public abstract void execute(TaskManager taskManager, Ui ui) throws EchoException;
+    public abstract String execute(TaskManager taskManager, Ui ui) throws EchoException;
 
     /**
      * Returns whether executing this command should end the session.

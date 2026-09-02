@@ -22,7 +22,7 @@ public class TodoCommand extends TaskCreationCommand {
      * Creates and displays a todo task.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        showAdded(taskManager.addTodo(getDescription()), taskManager, ui);
+    public String execute(TaskManager taskManager, Ui ui) {
+        return showAdded(taskManager.addTodo(getDescription()), taskManager, ui);
     }
 }

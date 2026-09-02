@@ -33,8 +33,9 @@ public abstract class TaskCreationCommand extends Command {
      * @param task newly created task.
      * @param taskManager task manager used to obtain the task count.
      * @param ui interface used to display the task.
+     * @return the task added message.
      */
-    protected void showAdded(Task task, TaskManager taskManager, Ui ui) {
-        ui.showAdded(task, taskManager.size());
+    protected String showAdded(Task task, TaskManager taskManager, Ui ui) {
+        return ui.showAdded(task, taskManager.size());
     }
 }

@@ -18,7 +18,7 @@ public class HelpCommand extends Command {
      * Displays the supported commands.
      */
     @Override
-    public void execute(TaskManager taskManager, Ui ui) {
-        ui.showHelp();
+    public String execute(TaskManager taskManager, Ui ui) {
+        return ui.showHelp();
     }
 }
