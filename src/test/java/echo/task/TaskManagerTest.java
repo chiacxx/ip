@@ -154,21 +154,15 @@ public class TaskManagerTest {
         manager.addTodo("only task");
 
         EchoException zeroException = assertThrows(
-                EchoException.class,
-                () -> manager.markTask(0)
-        );
+                EchoException.class, () -> manager.markTask(0));
         assertEquals(noTaskMessage(0), zeroException.getMessage());
 
         EchoException missingException = assertThrows(
-                EchoException.class,
-                () -> manager.unmarkTask(2)
-        );
+                EchoException.class, () -> manager.unmarkTask(2));
         assertEquals(noTaskMessage(2), missingException.getMessage());
 
         EchoException negativeException = assertThrows(
-                EchoException.class,
-                () -> manager.deleteTask(-1)
-        );
+                EchoException.class, () -> manager.deleteTask(-1));
         assertEquals(noTaskMessage(-1), negativeException.getMessage());
 
         assertEquals(1, manager.size());

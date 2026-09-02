@@ -292,9 +292,7 @@ public class CommandParserTest {
     @Test
     public void parse_unknownInput_exceptionThrown() {
         EchoException exception = assertThrows(
-                EchoException.class,
-                () -> parser.parse("dance")
-        );
+                EchoException.class, () -> parser.parse("dance"));
 
         assertTrue(exception.getMessage().contains("do not recognise 'dance'"));
         assertFalse(exception.getMessage().isBlank());
@@ -303,9 +301,7 @@ public class CommandParserTest {
     /** Asserts that parsing an input fails with the supplied complete message. */
     private void assertParseError(String input, String expectedMessage) {
         EchoException exception = assertThrows(
-                EchoException.class,
-                () -> parser.parse(input)
-        );
+                EchoException.class, () -> parser.parse(input));
 
         assertEquals(expectedMessage, exception.getMessage());
     }
@@ -313,14 +309,11 @@ public class CommandParserTest {
     /** Asserts that parsing an input fails with a message containing the supplied text. */
     private void assertParseErrorContaining(String input, String expectedText) {
         EchoException exception = assertThrows(
-                EchoException.class,
-                () -> parser.parse(input)
-        );
+                EchoException.class, () -> parser.parse(input));
 
         assertTrue(
-                exception.getMessage().contains(expectedText),
-                () -> "Expected error to contain '" + expectedText + "' but was: "
-                        + exception.getMessage()
+                exception.getMessage().contains(expectedText), () -> "Expected error to contain '"
+                        + expectedText + "' but was: " + exception.getMessage()
         );
     }
 }
