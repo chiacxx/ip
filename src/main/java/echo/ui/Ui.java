@@ -15,7 +15,7 @@ public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
 
     private static final String SEPARATOR = "----------------------------------------"
-            + "-------------------------------------------";
+            + "------------------------------------------------------------------";
 
     /** Prompt displayed while waiting for user input. */
     private static final String PROMPT = "E.C.H.O. >> ";
@@ -27,19 +27,20 @@ public class Ui implements AutoCloseable {
     private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
 
     /** Help text describing the commands supported by E.C.H.O. */
-    private static final String HELP_MESSAGE = """
+    private static final String HELP_MESSAGE =
+            """
             Available operations:
-              help                                         Show this help message
-              list                                         Display all tasks
-              todo <description>                           Add a todo task
-              deadline <description> /by <dd-mm-yyyy> [HH:MM]  Add a deadline task
-              event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]  Add an event task
-              mark <number>                                Mark a task as done
-              unmark <number>                              Mark a task as not done
-              delete <number>                              Remove a task
-              find <keyword>                               Find tasks by keyword
-              sort [date|name]                             Sort tasks by date (default) or name
-              bye                                          Disconnect from E.C.H.O.
+              help                                                                      Show this help message
+              list                                                                      Display all tasks
+              todo <description>                                                        Add a todo task
+              deadline <description> /by <dd-mm-yyyy> [HH:MM]                           Add a deadline task
+              event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]   Add an event task
+              mark <number>                                                             Mark a task as done
+              unmark <number>                                                           Mark a task as not done
+              delete <number>                                                           Remove a task
+              find <keyword>                                                            Find tasks by keyword
+              sort [date|name]                                                          Sort tasks by date or name
+              bye                                                                       Disconnect from E.C.H.O.
 
             Task numbers are shown by the 'list' command.""";
 

@@ -22,6 +22,8 @@ public class Main extends Application {
             Scene scene = new Scene(ap);
             stage.setScene(scene);
             stage.setTitle("E.C.H.O.");
+            stage.setWidth(950);
+            stage.setMinWidth(900);
             fxmlLoader.<MainWindow>getController().setEcho(echo);
             stage.show();
         } catch (IOException e) {
