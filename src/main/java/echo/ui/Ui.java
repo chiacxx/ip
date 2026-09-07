@@ -51,7 +51,7 @@ public class Ui implements AutoCloseable {
         """;
 
     /** Farewell messages selected randomly when a session ends. */
-    private static final List<String> FAREWELL_FLAVORS = List.of(
+    private static final List<String> FAREWELL_FLAVOURS = List.of(
             "Signal fading... E.C.H.O. signing off. Take care!",
             "Powering down the transmitter. Catch you soon!",
             "Going dark now. Thanks for the chat!"
@@ -164,7 +164,8 @@ public class Ui implements AutoCloseable {
      * @return the farewell message.
      */
     public String showFarewell() {
-        String farewell = FAREWELL_FLAVORS.get(RANDOM.nextInt(FAREWELL_FLAVORS.size()));
+        assert !FAREWELL_FLAVOURS.isEmpty() : "At least one farewell message must be configured";
+        String farewell = FAREWELL_FLAVOURS.get(RANDOM.nextInt(FAREWELL_FLAVOURS.size()));
         return showMessage(farewell);
     }
 
@@ -251,6 +252,8 @@ public class Ui implements AutoCloseable {
 
             int end = Math.min(RESPONSE_CONTENT_WIDTH, remaining.length());
             int breakAt = end < remaining.length() ? findWordBreak(remaining, end) : end;
+            assert breakAt > 0 && breakAt <= remaining.length()
+                    : "Response wrapping must consume at least one character";
 
             output.append(RESPONSE_INDENT).append(remaining, 0, breakAt);
             remaining = remaining.substring(breakAt).stripLeading();
