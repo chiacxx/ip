@@ -22,6 +22,6 @@ public class UnmarkCommand extends TaskNumberCommand {
      */
     @Override
     public String execute(TaskManager taskManager, Ui ui) throws EchoException {
-        return ui.showStatus(taskManager.unmarkTask(getTaskNumber()), false);
+        return ui.showUnmarked(taskManager.unmarkTask(getTaskNumber()));
     }
 }
