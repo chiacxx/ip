@@ -181,15 +181,23 @@ public class Ui implements AutoCloseable {
     }
 
     /**
-     * Displays the result of marking or unmarking a task.
+     * Displays the result of marking a task as done.
      *
-     * @param task Task whose status changed.
-     * @param isMarked Whether the task is now marked as done.
+     * @param task task that was marked as done.
      * @return the status change message.
      */
-    public String showStatus(Task task, boolean isMarked) {
-        String action = isMarked ? "marked" : "unmarked";
-        return showMessage("Task " + action + " successfully:\n  " + task);
+    public String showMarked(Task task) {
+        return showMessage("Task marked successfully:\n  " + task);
+    }
+
+    /**
+     * Displays the result of marking a task as not done.
+     *
+     * @param task task that was marked as not done.
+     * @return the status change message.
+     */
+    public String showUnmarked(Task task) {
+        return showMessage("Task unmarked successfully:\n  " + task);
     }
 
     /**
@@ -197,7 +205,7 @@ public class Ui implements AutoCloseable {
      *
      * @param taskNumber task number of the removed task.
      * @param task the task that has been removed.
-     * @param remainingTasks remaning number of tasks.
+     * @param remainingTasks remaining number of tasks.
      * @return the task deleted message.
      */
     public String showDeleted(int taskNumber, Task task, int remainingTasks) {
