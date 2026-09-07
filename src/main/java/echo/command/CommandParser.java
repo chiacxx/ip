@@ -117,8 +117,8 @@ public class CommandParser {
      * Parses a command that targets a specific task by its index.
      *
      * @param commandParts split tokens of the user input.
-     * @type the type of task-index command
-     * @return {@link ExitCommand} object.
+     * @param type the type of task-index command.
+     * @return parsed task-index {@link Command} object.
      * @throws EchoException if unexpected arguments are provided.
      */
     private Command parseTaskNumberCommand(String[] commandParts, Command.Type type)
@@ -183,32 +183,16 @@ public class CommandParser {
                     + DEADLINE_FORMAT);
         }
 
-        if (!containsMarker(content, "/by")) {
-            throw new EchoException("A deadline must include a due date using '/by <deadline>'. "
-                    + DEADLINE_FORMAT);
-        }
+        ArgumentPair arguments = splitByMarker(
+                content,
+                "/by",
+                "A deadline must include a due date using '/by <deadline>'. " + DEADLINE_FORMAT,
+                "A deadline needs a description before '/by'. " + DEADLINE_FORMAT,
+                "Please provide a due date after '/by'. " + DEADLINE_FORMAT
+        );
 
-        String[] parts = content.split("(?i)\\s+/by\\s+", 2);
-        if (parts.length == 1) {
-            if (content.toLowerCase(Locale.ROOT).startsWith("/by")) {
-                throw new EchoException("A deadline needs a description before '/by'. "
-                        + DEADLINE_FORMAT);
-            }
-            throw new EchoException("Please provide a due date after '/by'. "
-                    + DEADLINE_FORMAT);
-        }
-
-        if (parts[0].isBlank()) {
-            throw new EchoException("A deadline needs a description before '/by'. "
-                    + DEADLINE_FORMAT);
-        }
-        if (parts[1].isBlank()) {
-            throw new EchoException("Please provide a due date after '/by'. "
-                    + DEADLINE_FORMAT);
-        }
-
-        String description = parts[0].trim();
-        String dueDate = parts[1].trim();
+        String description = arguments.prefix();
+        String dueDate = arguments.suffix();
         validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
         return new DeadlineCommand(description, dueDate);
@@ -217,7 +201,7 @@ public class CommandParser {
     /**
      * Parses an event command and extracts its task description, start date, and end date.
      *
-     * @param input raw user input starting with the deadline keyword.
+     * @param input raw user input starting with the event keyword.
      * @return {@link EventCommand} object.
      * @throws EchoException if the description, delimiter, or date(s) are empty or erroneous.
      */
@@ -228,40 +212,26 @@ public class CommandParser {
                     "An event needs a description, start date, and end date. " + EVENT_FORMAT);
         }
 
-        if (!containsMarker(content, "/from")) {
-            throw new EchoException(
-                    "An event must include a start date using '/from <date>'. " + EVENT_FORMAT);
-        }
+        ArgumentPair eventParts = splitByMarker(
+                content,
+                "/from",
+                "An event must include a start date using '/from <date>'. " + EVENT_FORMAT,
+                "An event needs a description before '/from'. " + EVENT_FORMAT,
+                "Please provide a start date after '/from'. " + EVENT_FORMAT
+        );
 
-        String[] partsFrom = content.split("(?i)\\s+/from\\s+", 2);
-        if (partsFrom.length < 2) {
-            throw new EchoException("Please provide a start date after '/from'. " + EVENT_FORMAT);
-        }
-        if (partsFrom[0].isBlank()) {
-            throw new EchoException("An event needs a description before '/from'. " + EVENT_FORMAT);
-        }
+        ArgumentPair dateParts = splitByMarker(
+                eventParts.suffix(),
+                "/to",
+                "An event must include an end date using '/to <date>'. " + EVENT_FORMAT,
+                "Please provide a start date after '/from'. " + EVENT_FORMAT,
+                "Please provide an end date after '/to'. " + EVENT_FORMAT
+        );
 
-        if (!containsMarker(partsFrom[1], "/to")) {
-            throw new EchoException("An event must include an end date using '/to <date>'. " + EVENT_FORMAT);
-        }
+        String description = eventParts.prefix();
+        String startDate = dateParts.prefix();
+        String endDate = dateParts.suffix();
 
-        String[] partsTo = partsFrom[1].split("(?i)\\s+/to\\s+", 2);
-        if (partsTo.length < 2) {
-            if (partsFrom[1].trim().toLowerCase(Locale.ROOT).startsWith("/to")) {
-                throw new EchoException("Please provide a start date after '/from'. " + EVENT_FORMAT);
-            }
-            throw new EchoException("Please provide an end date after '/to'. " + EVENT_FORMAT);
-        }
-        if (partsTo[0].isBlank()) {
-            throw new EchoException("Please provide a start date after '/from'. " + EVENT_FORMAT);
-        }
-        if (partsTo[1].isBlank()) {
-            throw new EchoException("Please provide an end date after '/to'. " + EVENT_FORMAT);
-        }
-
-        String description = partsFrom[0].trim();
-        String startDate = partsTo[0].trim();
-        String endDate = partsTo[1].trim();
         validateDateTime(startDate, "event start", EVENT_FORMAT);
         validateDateTime(endDate, "event end", EVENT_FORMAT);
 
@@ -293,10 +263,69 @@ public class CommandParser {
         }
     }
 
+    /**
+     * Splits text into prefix and suffix segments around a delimiter marker.
+     *
+     * @param text full text containing the marker.
+     * @param marker delimiter marker such as {@code /by} or {@code /from}.
+     * @param missingMarkerMessage error message if the marker is not found.
+     * @param emptyPrefixMessage error message if the prefix before the marker is blank.
+     * @param emptySuffixMessage error message if the suffix after the marker is blank.
+     * @return an {@link ArgumentPair} containing the trimmed prefix and suffix.
+     * @throws EchoException if the marker is missing or either segment is blank.
+     */
+    private ArgumentPair splitByMarker(String text, String marker, String missingMarkerMessage,
+            String emptyPrefixMessage, String emptySuffixMessage) throws EchoException {
+        int markerIndex = findMarkerIndex(text, marker);
+        if (markerIndex == -1) {
+            throw new EchoException(missingMarkerMessage);
+        }
 
-    /** Checks for a field marker such as {@code /by}, ignoring letter case. */
-    private static boolean containsMarker(String content, String marker) {
-        return content.toLowerCase(Locale.ROOT).contains(marker.toLowerCase(Locale.ROOT));
+        String prefix = text.substring(0, markerIndex).trim();
+        if (prefix.isBlank()) {
+            throw new EchoException(emptyPrefixMessage);
+        }
+
+        String suffix = text.substring(markerIndex + marker.length()).trim();
+        if (suffix.isBlank()) {
+            throw new EchoException(emptySuffixMessage);
+        }
+
+        return new ArgumentPair(prefix, suffix);
+    }
+
+    /**
+     * Finds the starting index of a delimiter marker as a distinct token, ignoring case.
+     *
+     * @param text text to search.
+     * @param marker delimiter marker to locate.
+     * @return zero-based index of the marker, or -1 if not found.
+     */
+    private static int findMarkerIndex(String text, String marker) {
+        String lowerText = text.toLowerCase(Locale.ROOT);
+        String lowerMarker = marker.toLowerCase(Locale.ROOT);
+        int markerLength = lowerMarker.length();
+        int searchFrom = 0;
+
+        while (searchFrom < lowerText.length()) {
+            int index = lowerText.indexOf(lowerMarker, searchFrom);
+            if (index == -1) {
+                return -1;
+            }
+
+            boolean isPrecededByBoundary = (index == 0)
+                    || Character.isWhitespace(text.charAt(index - 1));
+            boolean isFollowedByBoundary = (index + markerLength == text.length())
+                    || Character.isWhitespace(text.charAt(index + markerLength));
+
+            if (isPrecededByBoundary && isFollowedByBoundary) {
+                return index;
+            }
+
+            searchFrom = index + 1;
+        }
+
+        return -1;
     }
 
     /** Extracts the text following the first whitespace-separated command. */
@@ -307,5 +336,14 @@ public class CommandParser {
             }
         }
         return "";
+    }
+
+    /**
+     * Holds a pair of prefix and suffix argument strings extracted from a command.
+     *
+     * @param prefix the argument before the marker.
+     * @param suffix the argument after the marker.
+     */
+    private record ArgumentPair(String prefix, String suffix) {
     }
 }
