@@ -3,6 +3,8 @@ package echo.ui;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import echo.task.Task;
 
@@ -148,14 +150,10 @@ public class Ui implements AutoCloseable {
             return showMessage("List is empty!");
         }
 
-        StringBuilder response = new StringBuilder("Your tasks:\n");
-        for (int i = 0; i < tasks.size(); i++) {
-            response.append(i + 1)
-                    .append(": ")
-                    .append(tasks.get(i))
-                    .append("\n");
-        }
-        return showMessage(response.toString().stripTrailing());
+        String taskList = IntStream.range(0, tasks.size())
+                .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
+                .collect(Collectors.joining("\n"));
+        return showMessage("Your tasks:\n" + taskList);
     }
 
     /**

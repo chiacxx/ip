@@ -6,8 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import echo.task.DeadlineTask;
 import echo.task.EventTask;
@@ -52,14 +52,10 @@ public class Storage {
         }
 
         try {
-            List<Task> tasks = new ArrayList<>();
-            for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
-                Task task = parseTask(line);
-                if (task != null) {
-                    tasks.add(task);
-                }
-            }
-            return tasks;
+            return Files.readAllLines(filePath, StandardCharsets.UTF_8).stream()
+                    .map(this::parseTask)
+                    .filter(Objects::nonNull)
+                    .toList();
         } catch (IOException exception) {
             throw new UncheckedIOException("Unable to load tasks from " + filePath, exception);
         }
