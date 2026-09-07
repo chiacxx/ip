@@ -152,8 +152,9 @@ public class TaskManager {
      * @throws EchoException if the task number is unavailable.
      */
     public Task deleteTask(int taskNumber) throws EchoException {
-        requireTask(taskNumber);
+        Task task = requireTask(taskNumber);
         Task removedTask = taskList.removeTask(taskNumber);
+        assert removedTask == task : "The task removed must be the task that was validated";
         save();
         return removedTask;
     }
@@ -161,6 +162,7 @@ public class TaskManager {
     /** Adds a task and persists the updated list. */
     private Task addTask(Task task) {
         taskList.addTask(task);
+        assert taskList.getTask(taskList.size()) == task : "A newly added task must be appended";
         save();
         return task;
     }

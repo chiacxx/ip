@@ -40,6 +40,7 @@ public class TaskList {
      * @return the removed task.
      */
     public Task removeTask(int taskNumber) {
+        assert hasTask(taskNumber) : "A task number must refer to an existing task";
         return tasks.remove(taskNumber - 1);
     }
 
@@ -50,6 +51,7 @@ public class TaskList {
      * @return task at that position.
      */
     public Task getTask(int taskNumber) {
+        assert hasTask(taskNumber) : "A task number must refer to an existing task";
         return tasks.get(taskNumber - 1);
     }
 

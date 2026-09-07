@@ -14,6 +14,7 @@ public abstract class TaskNumberCommand extends Command {
      */
     protected TaskNumberCommand(Type type, int taskNumber) {
         super(type, List.of(String.valueOf(taskNumber)));
+        assert taskNumber >= 1 : "Task-number commands must use one-based positive numbers";
     }
 
     /**
