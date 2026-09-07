@@ -1,6 +1,9 @@
 package echo.task;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import echo.EchoException;
 import echo.storage.Storage;
@@ -9,6 +12,42 @@ import echo.storage.Storage;
  * Provides the task operations used by E.C.H.O.
  */
 public class TaskManager {
+    /** Comparator that sorts tasks chronologically with undated tasks placed at the end. */
+    private static final Comparator<Task> CHRONOLOGICAL_COMPARATOR = (first, second) -> {
+        Optional<LocalDateTime> firstTime = first.getDateTime();
+        Optional<LocalDateTime> secondTime = second.getDateTime();
+
+        if (firstTime.isPresent() && secondTime.isPresent()) {
+            int comparison = firstTime.get().compareTo(secondTime.get());
+            if (comparison != 0) {
+                return comparison;
+            }
+        } else if (firstTime.isPresent()) {
+            return -1;
+        } else if (secondTime.isPresent()) {
+            return 1;
+        }
+        return first.getDescription().compareToIgnoreCase(second.getDescription());
+    };
+
+    /** Comparator that sorts tasks alphabetically by description (case-insensitive). */
+    private static final Comparator<Task> NAME_COMPARATOR = (first, second) -> {
+        int comparison = first.getDescription().compareToIgnoreCase(second.getDescription());
+        if (comparison != 0) {
+            return comparison;
+        }
+        Optional<LocalDateTime> firstTime = first.getDateTime();
+        Optional<LocalDateTime> secondTime = second.getDateTime();
+        if (firstTime.isPresent() && secondTime.isPresent()) {
+            return firstTime.get().compareTo(secondTime.get());
+        } else if (firstTime.isPresent()) {
+            return -1;
+        } else if (secondTime.isPresent()) {
+            return 1;
+        }
+        return 0;
+    };
+
     /** The task list used to store tasks in memory. */
     private final TaskList taskList;
     /** The storage used to persist task changes. */
@@ -157,6 +196,22 @@ public class TaskManager {
         assert removedTask == task : "The task removed must be the task that was validated";
         save();
         return removedTask;
+    }
+
+    /**
+     * Sorts the tasks using the supplied criteria and persists the new order.
+     *
+     * @param criteria the criteria to sort tasks by.
+     * @return the sorted list of tasks.
+     */
+    public List<Task> sortTasks(SortCriteria criteria) {
+        Comparator<Task> comparator = switch (criteria) {
+            case DATE -> CHRONOLOGICAL_COMPARATOR;
+            case NAME -> NAME_COMPARATOR;
+        };
+        taskList.sort(comparator);
+        save();
+        return taskList.asList();
     }
 
     /** Adds a task and persists the updated list. */

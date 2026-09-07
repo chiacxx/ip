@@ -1,6 +1,7 @@
 package echo.task;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -96,5 +97,14 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.getDescription().contains(keyword))
                 .toList();
+    }
+
+    /**
+     * Sorts the tasks in this list using the supplied comparator.
+     *
+     * @param comparator comparator used to determine the task ordering.
+     */
+    public void sort(Comparator<Task> comparator) {
+        tasks.sort(comparator);
     }
 }

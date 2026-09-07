@@ -1,7 +1,9 @@
 package echo.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 import echo.util.DateTimeParser;
 
@@ -26,6 +28,11 @@ public class DeadlineTask extends Task {
         DateTimeParser.DateTimeValue dateTime = DateTimeParser.parse(by);
         this.by = dateTime.date();
         this.byTime = dateTime.time();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getDateTime() {
+        return Optional.of(LocalDateTime.of(by, byTime != null ? byTime : LocalTime.MIDNIGHT));
     }
 
     @Override
