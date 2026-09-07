@@ -47,6 +47,52 @@ public class CommandParserTest {
     }
 
     @Test
+    public void parse_sortInputWithoutCriteria_returnsSortCommandWithDate() throws EchoException {
+        Command command = parser.parse("sort");
+
+        assertInstanceOf(SortCommand.class, command);
+        assertEquals(Command.Type.SORT, command.getType());
+        assertEquals("date", command.getArgument(0));
+    }
+
+    @Test
+    public void parse_sortInputWithDateCriteria_returnsSortCommandWithDate() throws EchoException {
+        Command command = parser.parse("sort date");
+
+        assertInstanceOf(SortCommand.class, command);
+        assertEquals(Command.Type.SORT, command.getType());
+        assertEquals("date", command.getArgument(0));
+    }
+
+    @Test
+    public void parse_sortInputWithNameCriteria_returnsSortCommandWithName() throws EchoException {
+        Command command = parser.parse("sort name");
+
+        assertInstanceOf(SortCommand.class, command);
+        assertEquals(Command.Type.SORT, command.getType());
+        assertEquals("name", command.getArgument(0));
+    }
+
+    @Test
+    public void parse_sortInputWithDescriptionCriteria_returnsSortCommandWithName() throws EchoException {
+        Command command = parser.parse("sort description");
+
+        assertInstanceOf(SortCommand.class, command);
+        assertEquals(Command.Type.SORT, command.getType());
+        assertEquals("name", command.getArgument(0));
+    }
+
+    @Test
+    public void parse_sortInputWithInvalidCriteria_exceptionThrown() {
+        assertParseErrorContaining("sort priority", "sort criterion");
+    }
+
+    @Test
+    public void parse_sortInputWithTooManyArguments_exceptionThrown() {
+        assertParseErrorContaining("sort date now", "Too many arguments");
+    }
+
+    @Test
     public void parse_todoInput_returnsTodoCommandWithCompleteDescription() throws EchoException {
         Command command = parser.parse("todo read book");
 

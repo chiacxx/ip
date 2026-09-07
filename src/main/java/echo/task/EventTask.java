@@ -1,7 +1,9 @@
 package echo.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 import echo.util.DateTimeParser;
 
@@ -36,6 +38,11 @@ public class EventTask extends Task {
         this.fromTime = fromDateTime.time();
         this.to = toDateTime.date();
         this.toTime = toDateTime.time();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getDateTime() {
+        return Optional.of(LocalDateTime.of(from, fromTime != null ? fromTime : LocalTime.MIDNIGHT));
     }
 
     @Override

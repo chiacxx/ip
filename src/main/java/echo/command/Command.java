@@ -22,6 +22,8 @@ public abstract class Command {
         DELETE,
         /** Finds by keyword. */
         FIND,
+        /** Sorts the task list. */
+        SORT,
         /** Ends the session. */
         BYE
     }

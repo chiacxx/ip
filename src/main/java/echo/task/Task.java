@@ -1,5 +1,8 @@
 package echo.task;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 /**
  * Represents a task in E.C.H.O.'s task list.
  */
@@ -62,9 +65,20 @@ public class Task {
     }
 
     /**
-     * Returns the user-entered task description for subclasses.
+     * Returns the associated date and time of this task, if any.
+     *
+     * @return an {@link Optional} containing the date-time, or empty if undated.
      */
-    protected String getDescription() {
+    public Optional<LocalDateTime> getDateTime() {
+        return Optional.empty();
+    }
+
+    /**
+     * Returns the user-entered task description.
+     *
+     * @return the task description.
+     */
+    public String getDescription() {
         return description;
     }
 

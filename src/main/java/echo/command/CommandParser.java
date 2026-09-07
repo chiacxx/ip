@@ -4,6 +4,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 import echo.EchoException;
+import echo.task.SortCriteria;
 import echo.util.DateTimeParser;
 
 /**
@@ -60,10 +61,34 @@ public class CommandParser {
             case "unmark" -> parseTaskNumberCommand(commandParts, Command.Type.UNMARK);
             case "delete" -> parseTaskNumberCommand(commandParts, Command.Type.DELETE);
             case "find" -> parseFindCommand(commandParts);
+            case "sort" -> parseSortCommand(commandParts);
             case "bye" -> parseExitCommand(commandParts);
             default -> throw new EchoException("I do not recognise '" + commandName
                     + "'. Try 'help' to see the available commands.");
         };
+    }
+
+    /**
+     * Parses a sort command with optional sorting criteria.
+     *
+     * @param commandParts split tokens of the user input.
+     * @return parsed {@link SortCommand} object.
+     * @throws EchoException if unexpected or invalid sort criteria are provided.
+     */
+    private Command parseSortCommand(String[] commandParts) throws EchoException {
+        if (commandParts.length == 1) {
+            return new SortCommand(SortCriteria.DATE);
+        }
+        if (commandParts.length == 2) {
+            String criterion = commandParts[1].toLowerCase(Locale.ROOT);
+            return switch (criterion) {
+                case "date" -> new SortCommand(SortCriteria.DATE);
+                case "name", "description" -> new SortCommand(SortCriteria.NAME);
+                default -> throw new EchoException("I do not recognise '" + commandParts[1]
+                        + "' as a sort criterion. Try: 'sort', 'sort date', or 'sort name'.");
+            };
+        }
+        throw new EchoException("Too many arguments for sort. Try: 'sort [date|name]'.");
     }
 
     /** Parses a find command. */

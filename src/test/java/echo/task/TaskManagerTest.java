@@ -195,6 +195,59 @@ public class TaskManagerTest {
                 reloadedManager.getTask(2).toFileFormat());
     }
 
+    @Test
+    public void sortTasks_byDate_sortsChronologicallyWithUndatedAtEnd() {
+        TaskManager manager = createManager();
+        Task todo = manager.addTodo("buy groceries");
+        Task deadlineLate = manager.addDeadline("final paper", "20-10-2026 18:00");
+        Task deadlineEarly = manager.addDeadline("homework", "05-10-2026");
+        Task eventMid = manager.addEvent("conference", "10-10-2026 09:00", "12-10-2026 17:00");
+
+        List<Task> sorted = manager.sortTasks(SortCriteria.DATE);
+
+        assertEquals(List.of(deadlineEarly, eventMid, deadlineLate, todo), sorted);
+        assertEquals(List.of(deadlineEarly, eventMid, deadlineLate, todo), manager.getTasks());
+    }
+
+    @Test
+    public void sortTasks_byName_sortsAlphabetically() {
+        TaskManager manager = createManager();
+        Task zebra = manager.addTodo("zebra crossing");
+        Task apple = manager.addDeadline("apple picking", "20-10-2026");
+        Task banana = manager.addEvent("banana festival", "10-10-2026", "11-10-2026");
+
+        List<Task> sorted = manager.sortTasks(SortCriteria.NAME);
+
+        assertEquals(List.of(apple, banana, zebra), sorted);
+        assertEquals(List.of(apple, banana, zebra), manager.getTasks());
+    }
+
+    @Test
+    public void sortTasks_persistsSortedList() {
+        Storage storage = new Storage(storagePath());
+        TaskManager manager = new TaskManager(new TaskList(), storage);
+        manager.addTodo("read book");
+        manager.addDeadline("submit report", "01-10-2026");
+
+        manager.sortTasks(SortCriteria.DATE);
+
+        TaskManager reloadedManager = new TaskManager(
+                new TaskList(storage.load()),
+                storage
+        );
+        assertEquals(2, reloadedManager.size());
+        assertInstanceOf(DeadlineTask.class, reloadedManager.getTask(1));
+        assertInstanceOf(TodoTask.class, reloadedManager.getTask(2));
+    }
+
+    @Test
+    public void sortTasks_onEmptyList_returnsEmptyList() {
+        TaskManager manager = createManager();
+
+        assertTrue(manager.sortTasks(SortCriteria.DATE).isEmpty());
+        assertTrue(manager.sortTasks(SortCriteria.NAME).isEmpty());
+    }
+
     /** Creates a manager whose storage file is isolated to the current test. */
     private TaskManager createManager() {
         return new TaskManager(new TaskList(), new Storage(storagePath()));

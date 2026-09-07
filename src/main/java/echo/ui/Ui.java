@@ -38,6 +38,7 @@ public class Ui implements AutoCloseable {
               unmark <number>                              Mark a task as not done
               delete <number>                              Remove a task
               find <keyword>                               Find tasks by keyword
+              sort [date|name]                             Sort tasks by date (default) or name
               bye                                          Disconnect from E.C.H.O.
 
             Task numbers are shown by the 'list' command.""";
@@ -154,6 +155,23 @@ public class Ui implements AutoCloseable {
                 .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
                 .collect(Collectors.joining("\n"));
         return showMessage("Your tasks:\n" + taskList);
+    }
+
+    /**
+     * Displays all tasks after being sorted, or an empty-list message when there are no tasks.
+     *
+     * @param tasks sorted list of tasks.
+     * @return the sorted task list message.
+     */
+    public String showSorted(List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            return showMessage("List is empty! Nothing to sort.");
+        }
+
+        String taskList = IntStream.range(0, tasks.size())
+                .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
+                .collect(Collectors.joining("\n"));
+        return showMessage("Tasks sorted successfully:\n" + taskList);
     }
 
     /**
