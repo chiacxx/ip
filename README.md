@@ -36,3 +36,18 @@ bye
 
 Task numbers are the one-based numbers shown by `list`. Invalid commands and
 task formats are reported with an explanation and an example of how to fix them.
+
+## Acknowledgements
+
+### Use of Generative AI Tools
+
+This project made extensive use of generative AI assistance throughout development, in accordance with the module's policy on AI assistance:
+
+* **Tools Used**:
+  * **OpenAI Codex / ChatGPT**: Used as an intelligent code-completion and pair-programming tool during initial feature development and refactoring.
+  * **Google Antigravity**: Used for codebase analysis, test suite generation, coding standard verification, and project workflow assistance.
+* **Extent of Use**:
+  * **Architecture & Refactoring**: Refining OOP class structures (Command pattern, Task hierarchy, TaskManager/TaskList separation) and adhering to the Single Level of Abstraction Principle (SLAP).
+  * **Automated Unit Testing**: Writing and expanding JUnit 5 test suites for `DateTimeParser`, `Ui`, `TaskList`, `Task`, `Storage`, and command executions, achieving comprehensive branch and instruction coverage.
+  * **Error Handling & Edge Cases**: Designing defensive checks for corrupted storage files, chronological event validations, and duplicate task detection.
+  * **Coding Standards & Documentation**: Ensuring strict compliance with SE-EDU Checkstyle configurations, generating standard-compliant Javadocs, drafting commit messages following SE-EDU Git conventions, and structuring the manual testing guide.
