@@ -31,7 +31,7 @@ public class EchoTest {
 
         String response = echo.getResponse("todo read book");
 
-        assertTrue(response.contains("Added the following task:"));
+        assertTrue(response.contains("[DIRECTIVE LOGGED]"));
         assertTrue(response.contains("read book"));
         assertFalse(echo.isExit());
     }

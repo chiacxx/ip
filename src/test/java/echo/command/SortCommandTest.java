@@ -26,7 +26,7 @@ public class SortCommandTest {
 
         String result = command.execute(manager, ui);
 
-        assertTrue(result.contains("List is empty! Nothing to sort."));
+        assertTrue(result.contains("Directive manifest is empty! Nothing to sort."));
     }
 
     @Test
@@ -39,7 +39,7 @@ public class SortCommandTest {
 
         String result = command.execute(manager, ui);
 
-        assertTrue(result.contains("Tasks sorted successfully:"));
+        assertTrue(result.contains("Directives organized successfully:"));
         assertTrue(result.indexOf("return book") < result.indexOf("read book"));
     }
 

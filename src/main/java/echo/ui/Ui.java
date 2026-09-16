@@ -9,7 +9,8 @@ import java.util.stream.IntStream;
 import echo.task.Task;
 
 /**
- * Handles all command-line interaction for E.C.H.O.
+ * Handles all user interface interaction for E.C.H.O.
+ * (Everyday Conversational and Helpful Operator).
  */
 public class Ui implements AutoCloseable {
     /** Horizontal line used to frame E.C.H.O. responses. */
@@ -18,7 +19,7 @@ public class Ui implements AutoCloseable {
             + "------------------------------------------------------------------";
 
     /** Prompt displayed while waiting for user input. */
-    private static final String PROMPT = "E.C.H.O. >> ";
+    private static final String PROMPT = "[E.C.H.O. // SYS] >> ";
 
     /** Indentation applied to each response line. */
     private static final String RESPONSE_INDENT = "  ";
@@ -27,22 +28,21 @@ public class Ui implements AutoCloseable {
     private static final int RESPONSE_CONTENT_WIDTH = SEPARATOR.length() - RESPONSE_INDENT.length();
 
     /** Help text describing the commands supported by E.C.H.O. */
-    private static final String HELP_MESSAGE =
-            """
-            Available operations:
-              help                                                                      Show this help message
-              list                                                                      Display all tasks
-              todo <description>                                                        Add a todo task
-              deadline <description> /by <dd-mm-yyyy> [HH:MM]                           Add a deadline task
-              event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]   Add an event task
-              mark <number>                                                             Mark a task as done
-              unmark <number>                                                           Mark a task as not done
-              delete <number>                                                           Remove a task
-              find <keyword>                                                            Find tasks by keyword
-              sort [date|name]                                                          Sort tasks by date or name
-              bye                                                                       Disconnect from E.C.H.O.
+    private static final String HELP_MESSAGE = """
+        === TACTICAL PROTOCOL DIRECTIVES ===
+          help                                                                      Show tactical manual
+          list                                                                      Display active directives
+          todo <description>                                                        Log standard directive
+          deadline <description> /by <dd-mm-yyyy> [HH:MM]                           Log deadline objective
+          event <description> /from <dd-mm-yyyy> [HH:MM] /to <dd-mm-yyyy> [HH:MM]   Log scheduled mission
+          mark <number>                                                             Mark objective as complete
+          unmark <number>                                                           Reopen active directive
+          delete <number>                                                           Purge directive from log
+          find <keyword>                                                            Scan telemetry by keyword
+          sort [date|name]                                                          Sort by date or name
+          bye                                                                       Disconnect from E.C.H.O.
 
-            Task numbers are shown by the 'list' command.""";
+        Directive numbers are indexed in the 'list' manifest.""";
 
     /** Startup banner displayed when an E.C.H.O. session begins. */
     private static final String BANNER = """
@@ -52,13 +52,14 @@ public class Ui implements AutoCloseable {
       |  __|| |    |  _  | |  | |
       | |___| |____| | | | |__| |
       |______\\_____|_| |_|\\____/ \s
+      [ Everyday Conversational & Helpful Operator // v2.1 ]
         """;
 
     /** Farewell messages selected randomly when a session ends. */
     private static final List<String> FAREWELL_FLAVOURS = List.of(
-            "Signal fading... E.C.H.O. signing off. Take care!",
-            "Powering down the transmitter. Catch you soon!",
-            "Going dark now. Thanks for the chat!"
+            "[SIGNAL TERMINATED] Cycling down telemetry arrays. E.C.H.O. signing off.",
+            "[COMM OFFLINE] Encrypting directive memory banks. Stay sharp out there, Commander.",
+            "[STANDBY MODE] Powering down transmitter. Telemetry preserved. Catch you soon!"
     );
 
     /** Random generator used to select a farewell message. */
@@ -97,7 +98,9 @@ public class Ui implements AutoCloseable {
      * @return the welcome message.
      */
     public String getWelcomeMessage() {
-        return "Signal established. Online and listening!\nType 'help' to view list of operations!";
+        return "[SECURE UPLINK ESTABLISHED]\n"
+                + "E.C.H.O. (Everyday Conversational & Helpful Operator) Online and listening!\n"
+                + "Sensor telemetry active. Awaiting directive. Type 'help' for tactical protocols.";
     }
 
     /**
@@ -138,7 +141,8 @@ public class Ui implements AutoCloseable {
      * @return the loading error message.
      */
     public String showLoadingError() {
-        return showError("I could not load your saved tasks. Starting with an empty list.");
+        return showError("[STORAGE FAULT DETECTED] Failed to load directive archive. "
+                + "Initializing empty register.");
     }
 
     /**
@@ -149,13 +153,13 @@ public class Ui implements AutoCloseable {
      */
     public String showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
-            return showMessage("List is empty!");
+            return showMessage("Tactical radar is clear. No active directives on record.");
         }
 
         String taskList = IntStream.range(0, tasks.size())
                 .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
                 .collect(Collectors.joining("\n"));
-        return showMessage("Your tasks:\n" + taskList);
+        return showMessage("[ACTIVE DIRECTIVE MANIFEST]\n" + taskList);
     }
 
     /**
@@ -166,13 +170,13 @@ public class Ui implements AutoCloseable {
      */
     public String showSorted(List<Task> tasks) {
         if (tasks.isEmpty()) {
-            return showMessage("List is empty! Nothing to sort.");
+            return showMessage("Directive manifest is empty! Nothing to sort.");
         }
 
         String taskList = IntStream.range(0, tasks.size())
                 .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
                 .collect(Collectors.joining("\n"));
-        return showMessage("Tasks sorted successfully:\n" + taskList);
+        return showMessage("[TELEMETRY REORDERED]\nDirectives organized successfully:\n" + taskList);
     }
 
     /**
@@ -194,8 +198,8 @@ public class Ui implements AutoCloseable {
      * @return the task added message.
      */
     public String showAdded(Task task, int totalTasks) {
-        return showMessage("Added the following task:\n  " + task
-                + "\nTotal tasks: " + totalTasks);
+        return showMessage("[DIRECTIVE LOGGED]\nCommitted to tactical memory:\n  " + task
+                + "\nActive directives in backlog: " + totalTasks);
     }
 
     /**
@@ -205,7 +209,7 @@ public class Ui implements AutoCloseable {
      * @return the status change message.
      */
     public String showMarked(Task task) {
-        return showMessage("Task marked successfully:\n  " + task);
+        return showMessage("[OBJECTIVE NEUTRALIZED]\nTarget marked as completed:\n  " + task);
     }
 
     /**
@@ -215,7 +219,7 @@ public class Ui implements AutoCloseable {
      * @return the status change message.
      */
     public String showUnmarked(Task task) {
-        return showMessage("Task unmarked successfully:\n  " + task);
+        return showMessage("[DIRECTIVE REOPENED]\nObjective marked as in-progress:\n  " + task);
     }
 
     /**
@@ -227,8 +231,8 @@ public class Ui implements AutoCloseable {
      * @return the task deleted message.
      */
     public String showDeleted(int taskNumber, Task task, int remainingTasks) {
-        return showMessage("Successfully removed Task #" + taskNumber + ":\n  " + task
-                + "\nTotal tasks: " + remainingTasks);
+        return showMessage("[PURGE COMPLETE]\nPurged directive #" + taskNumber + " from telemetry:\n  " + task
+                + "\nRemaining active directives: " + remainingTasks);
     }
 
     /** Releases the input source owned by this interface. */

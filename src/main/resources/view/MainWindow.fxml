@@ -13,8 +13,8 @@
     <HBox alignment="CENTER_LEFT" prefHeight="48.0" spacing="12.0" styleClass="header-bar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
         <Label styleClass="header-title" text="E.C.H.O." />
-        <Label styleClass="header-subtitle" text="Personal Task Assistant" />
-        <Label styleClass="header-status" text="● ONLINE" />
+        <Label styleClass="header-subtitle" text="Everyday Conversational &amp; Helpful Operator" />
+        <Label styleClass="header-status" text="● HUD ACTIVE" />
       </children>
     </HBox>
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" hvalue="1.0" prefHeight="540.0" prefWidth="850.0" styleClass="scroll-pane" vvalue="1.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="48.0">
@@ -24,8 +24,8 @@
     </ScrollPane>
     <HBox alignment="CENTER" prefHeight="62.0" spacing="10.0" styleClass="input-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
-        <TextField fx:id="userInput" onAction="#handleUserInput" promptText="Type a command (e.g., help, list, todo, deadline, event)..." styleClass="input-field" HBox.hgrow="ALWAYS" />
-        <Button fx:id="sendButton" mnemonicParsing="false" onAction="#handleUserInput" prefHeight="38.0" prefWidth="80.0" styleClass="send-button" text="Send" />
+        <TextField fx:id="userInput" onAction="#handleUserInput" promptText="Enter tactical directive (e.g., help, list, todo, deadline, event)..." styleClass="input-field" HBox.hgrow="ALWAYS" />
+        <Button fx:id="sendButton" mnemonicParsing="false" onAction="#handleUserInput" prefHeight="38.0" prefWidth="95.0" styleClass="send-button" text="SEND" />
       </children>
     </HBox>
   </children>
