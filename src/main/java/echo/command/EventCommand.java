@@ -2,6 +2,7 @@ package echo.command;
 
 import java.util.List;
 
+import echo.EchoException;
 import echo.task.TaskManager;
 import echo.ui.Ui;
 
@@ -24,7 +25,7 @@ public class EventCommand extends TaskCreationCommand {
      * Creates and displays an event task.
      */
     @Override
-    public String execute(TaskManager taskManager, Ui ui) {
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
         return showAdded(taskManager.addEvent(getDescription(), getArgument(1), getArgument(2)),
                 taskManager, ui);
     }

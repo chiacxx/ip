@@ -344,6 +344,86 @@ public class CommandParserTest {
         assertFalse(exception.getMessage().isBlank());
     }
 
+    @Test
+    public void parse_deadlineInputWithDuplicateByMarker_exceptionThrown() {
+        assertParseErrorContaining(
+                "deadline submit report /by 30-09-2026 /by 01-10-2026",
+                "specified multiple times"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithDuplicateFromMarker_exceptionThrown() {
+        assertParseErrorContaining(
+                "event camp /from 01-10-2026 /from 02-10-2026 /to 05-10-2026",
+                "specified multiple times"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithDuplicateToMarker_exceptionThrown() {
+        assertParseErrorContaining(
+                "event camp /from 01-10-2026 /to 05-10-2026 /to 06-10-2026",
+                "specified multiple times"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithReversedMarkerOrder_returnsEventCommand() throws EchoException {
+        Command command = parser.parse("event camp /to 05-10-2026 /from 01-10-2026");
+
+        assertInstanceOf(EventCommand.class, command);
+        assertEquals("camp", command.getArgument(0));
+        assertEquals("01-10-2026", command.getArgument(1));
+        assertEquals("05-10-2026", command.getArgument(2));
+    }
+
+    @Test
+    public void parse_taskDescriptionWithPipeCharacter_exceptionThrown() {
+        assertParseErrorContaining("todo read | book", "reserved for data storage");
+        assertParseErrorContaining("deadline submit | report /by 30-09-2026", "reserved for data storage");
+        assertParseErrorContaining("event camp /from 01-10-2026 | /to 05-10-2026", "reserved for data storage");
+    }
+
+    @Test
+    public void parse_eventInputWithStartAfterEndDate_exceptionThrown() {
+        assertParseErrorContaining(
+                "event conference /from 05-10-2026 /to 01-10-2026",
+                "cannot be after end date"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithIdenticalStartAndEndDateWithoutTime_exceptionThrown() {
+        assertParseErrorContaining(
+                "event seminar /from 01-10-2026 /to 01-10-2026",
+                "cannot be identical to end date"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithStartAfterEndTime_exceptionThrown() {
+        assertParseErrorContaining(
+                "event meeting /from 01-10-2026 16:00 /to 01-10-2026 14:00",
+                "cannot be after end time"
+        );
+    }
+
+    @Test
+    public void parse_eventInputWithSameStartAndEndTime_exceptionThrown() {
+        assertParseErrorContaining(
+                "event meeting /from 01-10-2026 14:00 /to 01-10-2026 14:00",
+                "cannot be the same as end time"
+        );
+    }
+
+    @Test
+    public void parse_taskDescriptionWithMultipleConsecutiveSpaces_normalizesSpaces() throws EchoException {
+        Command command = parser.parse("todo   read    multiple    books   ");
+
+        assertEquals("read multiple books", command.getArgument(0));
+    }
+
     /** Asserts that parsing an input fails with the supplied complete message. */
     private void assertParseError(String input, String expectedMessage) {
         EchoException exception = assertThrows(

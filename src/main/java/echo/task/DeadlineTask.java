@@ -3,6 +3,7 @@ package echo.task;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import echo.util.DateTimeParser;
@@ -39,6 +40,14 @@ public class DeadlineTask extends Task {
     public String toFileFormat() {
         return "D | " + getDoneFlag() + " | " + getDescription() + " | "
                 + DateTimeParser.formatForStorage(by, byTime);
+    }
+
+    @Override
+    public boolean isDuplicate(Task other) {
+        if (!super.isDuplicate(other) || !(other instanceof DeadlineTask otherDeadline)) {
+            return false;
+        }
+        return by.equals(otherDeadline.by) && Objects.equals(byTime, otherDeadline.byTime);
     }
 
     @Override

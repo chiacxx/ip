@@ -3,6 +3,7 @@ package echo.command;
 import java.util.List;
 import java.util.Locale;
 
+import echo.EchoException;
 import echo.task.SortCriteria;
 import echo.task.Task;
 import echo.task.TaskManager;
@@ -30,9 +31,10 @@ public class SortCommand extends Command {
      * @param taskManager service used to perform task operations.
      * @param ui interface used to display results.
      * @return response message confirming the sort operation.
+     * @throws EchoException if sorting or persistence fails.
      */
     @Override
-    public String execute(TaskManager taskManager, Ui ui) {
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
         List<Task> sortedTasks = taskManager.sortTasks(criteria);
         return ui.showSorted(sortedTasks);
     }

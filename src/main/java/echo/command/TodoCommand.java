@@ -2,6 +2,7 @@ package echo.command;
 
 import java.util.List;
 
+import echo.EchoException;
 import echo.task.TaskManager;
 import echo.ui.Ui;
 
@@ -22,7 +23,7 @@ public class TodoCommand extends TaskCreationCommand {
      * Creates and displays a todo task.
      */
     @Override
-    public String execute(TaskManager taskManager, Ui ui) {
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
         return showAdded(taskManager.addTodo(getDescription()), taskManager, ui);
     }
 }

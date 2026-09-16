@@ -8,6 +8,8 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
+import echo.EchoException;
+
 /**
  * Parses supported task dates and formats them for display and storage.
  */
@@ -54,6 +56,41 @@ public final class DateTimeParser {
      */
     public static void validate(String value) throws DateTimeParseException {
         parse(value);
+    }
+
+    /**
+     * Validates that the event start date-time strictly precedes the end date-time.
+     *
+     * @param start start date and optional time.
+     * @param end end date and optional time.
+     * @throws EchoException if the start date-time is later than or identical to the end date-time.
+     */
+    public static void validateChronologicalOrder(DateTimeValue start, DateTimeValue end)
+            throws EchoException {
+        if (start.date().isAfter(end.date())) {
+            throw new EchoException("Event start date (" + start.formatForDisplay()
+                    + ") cannot be after end date (" + end.formatForDisplay() + ").");
+        }
+
+        if (start.date().isEqual(end.date())) {
+            if (start.time() == null && end.time() == null) {
+                throw new EchoException("Event start date (" + start.formatForDisplay()
+                        + ") cannot be identical to end date without specifying distinct start and end times.");
+            }
+            if (start.time() != null && end.time() != null) {
+                if (start.time().isAfter(end.time())) {
+                    throw new EchoException("Event start time (" + start.formatForDisplay()
+                            + ") cannot be after end time (" + end.formatForDisplay() + ").");
+                }
+                if (start.time().equals(end.time())) {
+                    throw new EchoException("Event start time (" + start.formatForDisplay()
+                            + ") cannot be the same as end time.");
+                }
+            } else {
+                throw new EchoException("When an event occurs on the same date, both start and end "
+                        + "must specify times, and start must be before end.");
+            }
+        }
     }
 
     /**
