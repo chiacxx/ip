@@ -1,0 +1,177 @@
+/* Root application styling */
+.root {
+    -fx-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    -fx-background-color: #f8fafc;
+}
+
+/* Header Bar */
+.header-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10 20 10 20;
+    -fx-alignment: center-left;
+    -fx-spacing: 12;
+}
+
+.header-title {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.header-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.header-status {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+    -fx-background-radius: 12;
+    -fx-padding: 3 10 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Scroll Area & Container */
+.scroll-pane {
+    -fx-background-color: #f8fafc;
+    -fx-background: #f8fafc;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #f8fafc;
+}
+
+.dialog-container {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 14 18 14 18;
+    -fx-spacing: 14;
+}
+
+/* Slim Modern Scrollbar */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-pref-height: 0;
+    -fx-padding: 0;
+    -fx-opacity: 0;
+}
+
+/* Dialog Box rows */
+.dialog-box {
+    -fx-spacing: 10;
+}
+
+.user-dialog {
+    -fx-alignment: top-right;
+}
+
+.echo-dialog {
+    -fx-alignment: top-left;
+}
+
+/* Profile Picture styling */
+.display-picture {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 4, 0, 0, 1);
+}
+
+/* Base Speech Bubble */
+.dialog-label {
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+    -fx-font-size: 12.5px;
+    -fx-line-spacing: 2px;
+    -fx-padding: 10 14 10 14;
+    -fx-wrap-text: true;
+}
+
+/* User Bubble: Vibrant Blue, White Text */
+.user-label {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 16 16 4 16;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.22), 6, 0, 0, 2);
+}
+
+/* Echo Bubble: Crisp White Card, Dark Text, Light Border */
+.echo-label {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0f172a;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 16 16 16 4;
+    -fx-background-radius: 16 16 16 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 6, 0, 0, 2);
+}
+
+/* Bottom Input Bar */
+.input-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 12 18 12 18;
+    -fx-spacing: 10;
+    -fx-alignment: center;
+}
+
+.input-field {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 22;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 22;
+    -fx-border-width: 1px;
+    -fx-padding: 8 16 8 16;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-text-fill: #0f172a;
+}
+
+.input-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.2), 4, 0, 0, 1);
+}
+
+.send-button {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 22;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.25), 4, 0, 0, 1);
+}
+
+.send-button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.send-button:pressed {
+    -fx-background-color: #1e40af;
+}
+
+.send-button:disabled {
+    -fx-opacity: 0.5;
+}
