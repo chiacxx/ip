@@ -2,6 +2,7 @@ package echo.command;
 
 import java.util.List;
 
+import echo.EchoException;
 import echo.task.TaskManager;
 import echo.ui.Ui;
 
@@ -23,7 +24,7 @@ public class DeadlineCommand extends TaskCreationCommand {
      * Creates and displays a deadline task.
      */
     @Override
-    public String execute(TaskManager taskManager, Ui ui) {
+    public String execute(TaskManager taskManager, Ui ui) throws EchoException {
         return showAdded(taskManager.addDeadline(getDescription(), getArgument(1)), taskManager, ui);
     }
 }

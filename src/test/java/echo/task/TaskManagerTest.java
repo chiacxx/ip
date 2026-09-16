@@ -33,7 +33,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void addTodo_addsTodoTaskInInsertionOrder() {
+    public void addTodo_addsTodoTaskInInsertionOrder() throws EchoException {
         TaskManager manager = createManager();
 
         Task task = manager.addTodo("read book");
@@ -46,7 +46,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void addDeadline_addsDeadlineTask() {
+    public void addDeadline_addsDeadlineTask() throws EchoException {
         TaskManager manager = createManager();
 
         Task task = manager.addDeadline("submit report", "30-09-2026 16:00");
@@ -58,7 +58,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void addEvent_addsEventTask() {
+    public void addEvent_addsEventTask() throws EchoException {
         TaskManager manager = createManager();
 
         Task task = manager.addEvent("team meeting", "30-09-2026 14:00",
@@ -71,7 +71,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void addTasks_preservesInsertionOrder() {
+    public void addTasks_preservesInsertionOrder() throws EchoException {
         TaskManager manager = createManager();
         Task todo = manager.addTodo("read book");
         Task deadline = manager.addDeadline("submit report", "30-09-2026");
@@ -85,7 +85,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void findByKeyword_returnsMatchingTasksInInsertionOrder() {
+    public void findByKeyword_returnsMatchingTasksInInsertionOrder() throws EchoException {
         TaskManager manager = createManager();
         Task firstMatch = manager.addTodo("read book");
         manager.addTodo("submit report");
@@ -97,7 +97,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void findByKeyword_withNoMatches_returnsEmptyList() {
+    public void findByKeyword_withNoMatches_returnsEmptyList() throws EchoException {
         TaskManager manager = createManager();
         manager.addTodo("read book");
 
@@ -105,7 +105,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void getTasks_returnsReadOnlySnapshot() {
+    public void getTasks_returnsReadOnlySnapshot() throws EchoException {
         TaskManager manager = createManager();
         manager.addTodo("first task");
         List<Task> snapshot = manager.getTasks();
@@ -196,7 +196,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void sortTasks_byDate_sortsChronologicallyWithUndatedAtEnd() {
+    public void sortTasks_byDate_sortsChronologicallyWithUndatedAtEnd() throws EchoException {
         TaskManager manager = createManager();
         Task todo = manager.addTodo("buy groceries");
         Task deadlineLate = manager.addDeadline("final paper", "20-10-2026 18:00");
@@ -210,7 +210,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void sortTasks_byName_sortsAlphabetically() {
+    public void sortTasks_byName_sortsAlphabetically() throws EchoException {
         TaskManager manager = createManager();
         Task zebra = manager.addTodo("zebra crossing");
         Task apple = manager.addDeadline("apple picking", "20-10-2026");
@@ -223,7 +223,7 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void sortTasks_persistsSortedList() {
+    public void sortTasks_persistsSortedList() throws EchoException {
         Storage storage = new Storage(storagePath());
         TaskManager manager = new TaskManager(new TaskList(), storage);
         manager.addTodo("read book");
@@ -241,11 +241,92 @@ public class TaskManagerTest {
     }
 
     @Test
-    public void sortTasks_onEmptyList_returnsEmptyList() {
+    public void sortTasks_onEmptyList_returnsEmptyList() throws EchoException {
         TaskManager manager = createManager();
 
         assertTrue(manager.sortTasks(SortCriteria.DATE).isEmpty());
         assertTrue(manager.sortTasks(SortCriteria.NAME).isEmpty());
+    }
+
+    @Test
+    public void addTodo_duplicateDescription_throwsEchoException() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addTodo("read book");
+
+        EchoException exception = assertThrows(
+                EchoException.class, () -> manager.addTodo("read book"));
+        assertTrue(exception.getMessage().contains("already exists"));
+
+        EchoException caseException = assertThrows(
+                EchoException.class, () -> manager.addTodo("READ BOOK"));
+        assertTrue(caseException.getMessage().contains("already exists"));
+    }
+
+    @Test
+    public void addDeadline_duplicateDetails_throwsEchoException() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addDeadline("submit report", "30-09-2026 18:00");
+
+        EchoException exception = assertThrows(
+                EchoException.class, () -> manager.addDeadline("submit report", "30-09-2026 18:00"));
+        assertTrue(exception.getMessage().contains("already exists"));
+    }
+
+    @Test
+    public void addDeadline_sameDescriptionDifferentDate_success() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addDeadline("submit report", "30-09-2026");
+        manager.addDeadline("submit report", "01-10-2026");
+
+        assertEquals(2, manager.size());
+    }
+
+    @Test
+    public void addEvent_duplicateDetails_throwsEchoException() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addEvent("camp", "01-10-2026", "05-10-2026");
+
+        EchoException exception = assertThrows(
+                EchoException.class, () -> manager.addEvent("camp", "01-10-2026", "05-10-2026"));
+        assertTrue(exception.getMessage().contains("already exists"));
+    }
+
+    @Test
+    public void markTask_alreadyMarked_throwsEchoException() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addTodo("read book");
+        manager.markTask(1);
+
+        EchoException exception = assertThrows(
+                EchoException.class, () -> manager.markTask(1));
+        assertTrue(exception.getMessage().contains("already marked as completed"));
+    }
+
+    @Test
+    public void unmarkTask_alreadyUnmarked_throwsEchoException() throws EchoException {
+        TaskManager manager = createManager();
+        manager.addTodo("read book");
+
+        EchoException exception = assertThrows(
+                EchoException.class, () -> manager.unmarkTask(1));
+        assertTrue(exception.getMessage().contains("already marked as in-progress"));
+    }
+
+    @Test
+    public void operationsOnEmptyList_throwsEchoException() {
+        TaskManager manager = createManager();
+
+        EchoException markException = assertThrows(
+                EchoException.class, () -> manager.markTask(1));
+        assertTrue(markException.getMessage().contains("Directive backlog is empty"));
+
+        EchoException unmarkException = assertThrows(
+                EchoException.class, () -> manager.unmarkTask(1));
+        assertTrue(unmarkException.getMessage().contains("Directive backlog is empty"));
+
+        EchoException deleteException = assertThrows(
+                EchoException.class, () -> manager.deleteTask(1));
+        assertTrue(deleteException.getMessage().contains("Directive backlog is empty"));
     }
 
     /** Creates a manager whose storage file is isolated to the current test. */

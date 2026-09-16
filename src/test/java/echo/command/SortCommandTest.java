@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import echo.EchoException;
 import echo.storage.Storage;
 import echo.task.SortCriteria;
 import echo.task.TaskList;
@@ -19,7 +20,7 @@ public class SortCommandTest {
     private Path temporaryDirectory;
 
     @Test
-    public void execute_emptyList_returnsEmptyMessage() {
+    public void execute_emptyList_returnsEmptyMessage() throws EchoException {
         TaskManager manager = new TaskManager(new TaskList(), new Storage(storagePath()));
         Ui ui = new Ui();
         SortCommand command = new SortCommand(SortCriteria.DATE);
@@ -30,7 +31,7 @@ public class SortCommandTest {
     }
 
     @Test
-    public void execute_withTasks_returnsSuccessMessage() {
+    public void execute_withTasks_returnsSuccessMessage() throws EchoException {
         TaskManager manager = new TaskManager(new TaskList(), new Storage(storagePath()));
         manager.addTodo("read book");
         manager.addDeadline("return book", "15-10-2026");

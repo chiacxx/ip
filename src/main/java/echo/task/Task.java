@@ -47,6 +47,28 @@ public class Task {
     }
 
     /**
+     * Returns whether this task has been completed.
+     *
+     * @return true if completed; false otherwise.
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
+     * Checks whether another task has duplicate details to this task.
+     *
+     * @param other task to compare against.
+     * @return true if the tasks are duplicates; false otherwise.
+     */
+    public boolean isDuplicate(Task other) {
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        return description.equalsIgnoreCase(other.description);
+    }
+
+    /**
      * Returns this task in the format used by task-list persistence.
      *
      * @return serialised task data.

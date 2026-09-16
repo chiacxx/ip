@@ -184,13 +184,15 @@ public class CommandParser {
      *
      * @param input raw user input starting with the todo keyword.
      * @return {@link TodoCommand} object.
-     * @throws EchoException if the description is empty.
+     * @throws EchoException if the description is empty, contains forbidden characters, or invalid.
      */
     private Command parseTodoCommand(String input) throws EchoException {
-        String description = getCommandContent(input);
+        String description = getCommandContent(input).trim();
         if (description.isEmpty()) {
             throw new EchoException("A todo needs a description. " + TODO_FORMAT);
         }
+        validateSafeCharacters(description, "todo description");
+        description = description.replaceAll("\\s+", " ");
         return new TodoCommand(description);
     }
 
@@ -199,13 +201,19 @@ public class CommandParser {
      *
      * @param input raw user input starting with the deadline keyword.
      * @return {@link DeadlineCommand} object.
-     * @throws EchoException if the description, delimiter, or date are empty or erroneous.
+     * @throws EchoException if the description, delimiter, or date are empty, duplicate, or erroneous.
      */
     private Command parseDeadlineCommand(String input) throws EchoException {
         String content = getCommandContent(input);
         if (content.isEmpty()) {
             throw new EchoException("A deadline needs a description and a due date. "
                     + DEADLINE_FORMAT);
+        }
+
+        int byCount = countMarkerOccurrences(content, "/by");
+        if (byCount > 1) {
+            throw new EchoException("Parameter '/by' was specified multiple times. "
+                    + "Please provide only one '/by' parameter. " + DEADLINE_FORMAT);
         }
 
         ArgumentPair arguments = splitByMarker(
@@ -216,8 +224,11 @@ public class CommandParser {
                 "Please provide a due date after '/by'. " + DEADLINE_FORMAT
         );
 
-        String description = arguments.prefix();
+        String description = arguments.prefix().replaceAll("\\s+", " ");
         String dueDate = arguments.suffix();
+
+        validateSafeCharacters(description, "deadline description");
+        validateSafeCharacters(dueDate, "deadline due date");
         validateDateTime(dueDate, "deadline", DEADLINE_FORMAT);
 
         return new DeadlineCommand(description, dueDate);
@@ -228,7 +239,7 @@ public class CommandParser {
      *
      * @param input raw user input starting with the event keyword.
      * @return {@link EventCommand} object.
-     * @throws EchoException if the description, delimiter, or date(s) are empty or erroneous.
+     * @throws EchoException if the description, delimiter, or date(s) are empty, duplicate, or erroneous.
      */
     private Command parseEventCommand(String input) throws EchoException {
         String content = getCommandContent(input);
@@ -237,28 +248,67 @@ public class CommandParser {
                     "An event needs a description, start date, and end date. " + EVENT_FORMAT);
         }
 
-        ArgumentPair eventParts = splitByMarker(
-                content,
-                "/from",
-                "An event must include a start date using '/from <date>'. " + EVENT_FORMAT,
-                "An event needs a description before '/from'. " + EVENT_FORMAT,
-                "Please provide a start date after '/from'. " + EVENT_FORMAT
-        );
+        int fromCount = countMarkerOccurrences(content, "/from");
+        if (fromCount > 1) {
+            throw new EchoException("Parameter '/from' was specified multiple times. "
+                    + "Please provide only one '/from' parameter. " + EVENT_FORMAT);
+        }
 
-        ArgumentPair dateParts = splitByMarker(
-                eventParts.suffix(),
-                "/to",
-                "An event must include an end date using '/to <date>'. " + EVENT_FORMAT,
-                "Please provide a start date after '/from'. " + EVENT_FORMAT,
-                "Please provide an end date after '/to'. " + EVENT_FORMAT
-        );
+        int toCount = countMarkerOccurrences(content, "/to");
+        if (toCount > 1) {
+            throw new EchoException("Parameter '/to' was specified multiple times. "
+                    + "Please provide only one '/to' parameter. " + EVENT_FORMAT);
+        }
 
-        String description = eventParts.prefix();
-        String startDate = dateParts.prefix();
-        String endDate = dateParts.suffix();
+        if (fromCount == 0) {
+            throw new EchoException("An event must include a start date using '/from <date>'. "
+                    + EVENT_FORMAT);
+        }
+        if (toCount == 0) {
+            throw new EchoException("An event must include an end date using '/to <date>'. "
+                    + EVENT_FORMAT);
+        }
+
+        int fromIndex = findMarkerIndex(content, "/from");
+        int toIndex = findMarkerIndex(content, "/to");
+
+        String description;
+        String startDate;
+        String endDate;
+
+        if (fromIndex < toIndex) {
+            description = content.substring(0, fromIndex).trim();
+            startDate = content.substring(fromIndex + "/from".length(), toIndex).trim();
+            endDate = content.substring(toIndex + "/to".length()).trim();
+        } else {
+            description = content.substring(0, toIndex).trim();
+            endDate = content.substring(toIndex + "/to".length(), fromIndex).trim();
+            startDate = content.substring(fromIndex + "/from".length()).trim();
+        }
+
+        if (description.isBlank()) {
+            throw new EchoException("An event needs a description before '/from'. "
+                    + EVENT_FORMAT);
+        }
+        if (startDate.isBlank()) {
+            throw new EchoException("Please provide a start date after '/from'. " + EVENT_FORMAT);
+        }
+        if (endDate.isBlank()) {
+            throw new EchoException("Please provide an end date after '/to'. " + EVENT_FORMAT);
+        }
+
+        validateSafeCharacters(description, "event description");
+        validateSafeCharacters(startDate, "event start date");
+        validateSafeCharacters(endDate, "event end date");
+
+        description = description.replaceAll("\\s+", " ");
 
         validateDateTime(startDate, "event start", EVENT_FORMAT);
         validateDateTime(endDate, "event end", EVENT_FORMAT);
+
+        DateTimeParser.DateTimeValue fromDateTime = DateTimeParser.parse(startDate);
+        DateTimeParser.DateTimeValue toDateTime = DateTimeParser.parse(endDate);
+        DateTimeParser.validateChronologicalOrder(fromDateTime, toDateTime);
 
         return new EventCommand(description, startDate, endDate);
     }
@@ -282,10 +332,62 @@ public class CommandParser {
                         + DateTimeParser.TIME_FORMAT + ". " + commandFormat);
             }
 
-            throw new EchoException("'" + date + "' is not a valid date or time. "
-                    + "Please use " + DateTimeParser.DATE_TIME_FORMAT
-                    + " when including a time. " + commandFormat);
+            throw new EchoException("'" + date + "' is not a valid date or time "
+                    + "(such as a non-existent calendar date like Feb 30). " + commandFormat);
         }
+    }
+
+    /**
+     * Ensures user text does not contain reserved storage delimiter or newline characters.
+     *
+     * @param text input string to check.
+     * @param fieldName name of the field for error reporting.
+     * @throws EchoException if the text contains forbidden characters.
+     */
+    private static void validateSafeCharacters(String text, String fieldName) throws EchoException {
+        if (text.contains("|")) {
+            throw new EchoException("The " + fieldName + " cannot contain the '|' character "
+                    + "because it is reserved for data storage.");
+        }
+        if (text.contains("\n") || text.contains("\r")) {
+            throw new EchoException("The " + fieldName + " cannot contain newline characters.");
+        }
+    }
+
+    /**
+     * Counts how many times a delimiter marker appears as a distinct whitespace-bounded token.
+     *
+     * @param text text to search.
+     * @param marker delimiter marker such as {@code /by} or {@code /from}.
+     * @return number of occurrences.
+     */
+    private static int countMarkerOccurrences(String text, String marker) {
+        String lowerText = text.toLowerCase(Locale.ROOT);
+        String lowerMarker = marker.toLowerCase(Locale.ROOT);
+        int markerLength = lowerMarker.length();
+        int count = 0;
+        int searchFrom = 0;
+
+        while (searchFrom < lowerText.length()) {
+            int index = lowerText.indexOf(lowerMarker, searchFrom);
+            if (index == -1) {
+                break;
+            }
+
+            boolean isPrecededByBoundary = (index == 0)
+                    || Character.isWhitespace(text.charAt(index - 1));
+            boolean isFollowedByBoundary = (index + markerLength == text.length())
+                    || Character.isWhitespace(text.charAt(index + markerLength));
+
+            if (isPrecededByBoundary && isFollowedByBoundary) {
+                count++;
+                searchFrom = index + markerLength;
+            } else {
+                searchFrom = index + 1;
+            }
+        }
+
+        return count;
     }
 
     /**

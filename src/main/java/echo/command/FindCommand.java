@@ -21,6 +21,7 @@ public class FindCommand extends Command {
      */
     @Override
     public String execute(TaskManager taskManager, Ui ui) {
-        return ui.showTaskList(taskManager.findByKeyword(getArgument(0)));
+        String keyword = getArgument(0);
+        return ui.showFindResults(keyword, taskManager.findByKeyword(keyword));
     }
 }

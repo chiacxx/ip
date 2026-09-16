@@ -22,6 +22,8 @@ public class Echo {
     private final CommandParser commandParser;
     /** Manager for task operations and persistence. */
     private final TaskManager taskManager;
+    /** Storage warning or notice encountered during loading. */
+    private final String storageNotice;
     /** Flag indicating if an exit command has been received. */
     private boolean isExit;
 
@@ -61,13 +63,19 @@ public class Echo {
         this.storage = storage;
         this.commandParser = new CommandParser();
 
+        String notice = null;
         TaskList tasks;
         try {
             tasks = new TaskList(storage.load());
+            if (storage.hasCorruptedEntries()) {
+                notice = "[STORAGE NOTICE] Some corrupted entries in the archive could not be read and were skipped.";
+            }
         } catch (UncheckedIOException exception) {
             ui.showLoadingError();
             tasks = new TaskList();
+            notice = "[STORAGE FAULT] Failed to load directive archive. Initialized empty register.";
         }
+        this.storageNotice = notice;
         this.taskManager = new TaskManager(tasks, this.storage);
     }
 
@@ -105,7 +113,11 @@ public class Echo {
      * @return startup welcome message.
      */
     public String getWelcomeMessage() {
-        return ui.getWelcomeMessage();
+        String welcome = ui.getWelcomeMessage();
+        if (storageNotice != null) {
+            return welcome + "\n\n" + storageNotice;
+        }
+        return welcome;
     }
 
     /**

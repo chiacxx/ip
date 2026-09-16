@@ -67,6 +67,16 @@ public class TaskList {
     }
 
     /**
+     * Checks whether an identical task already exists in this list.
+     *
+     * @param task task to test for duplicates.
+     * @return true if an identical task is found; false otherwise.
+     */
+    public boolean hasDuplicate(Task task) {
+        return tasks.stream().anyMatch(existing -> existing.isDuplicate(task));
+    }
+
+    /**
      * Returns the number of stored tasks.
      */
     public int size() {

@@ -163,6 +163,24 @@ public class Ui implements AutoCloseable {
     }
 
     /**
+     * Displays search results matching a keyword, or a not-found message if empty.
+     *
+     * @param keyword search keyword.
+     * @param tasks matching tasks.
+     * @return the search results message.
+     */
+    public String showFindResults(String keyword, List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            return showMessage("No directives found matching keyword: '" + keyword + "'.");
+        }
+
+        String taskList = IntStream.range(0, tasks.size())
+                .mapToObj(i -> (i + 1) + ": " + tasks.get(i))
+                .collect(Collectors.joining("\n"));
+        return showMessage("[MATCHING DIRECTIVES]\n" + taskList);
+    }
+
+    /**
      * Displays all tasks after being sorted, or an empty-list message when there are no tasks.
      *
      * @param tasks sorted list of tasks.

@@ -3,8 +3,10 @@ package echo.task;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Optional;
 
+import echo.EchoException;
 import echo.util.DateTimeParser;
 
 /**
@@ -29,15 +31,28 @@ public class EventTask extends Task {
      * @param description event description.
      * @param from event start date with an optional time.
      * @param to event end date with an optional time.
+     * @throws EchoException if the event dates or times are out of chronological order.
      */
-    public EventTask(String description, String from, String to) {
+    public EventTask(String description, String from, String to) throws EchoException {
         super(description);
         DateTimeParser.DateTimeValue fromDateTime = DateTimeParser.parse(from);
         DateTimeParser.DateTimeValue toDateTime = DateTimeParser.parse(to);
+        DateTimeParser.validateChronologicalOrder(fromDateTime, toDateTime);
         this.from = fromDateTime.date();
         this.fromTime = fromDateTime.time();
         this.to = toDateTime.date();
         this.toTime = toDateTime.time();
+    }
+
+    @Override
+    public boolean isDuplicate(Task other) {
+        if (!super.isDuplicate(other) || !(other instanceof EventTask otherEvent)) {
+            return false;
+        }
+        return from.equals(otherEvent.from)
+                && Objects.equals(fromTime, otherEvent.fromTime)
+                && to.equals(otherEvent.to)
+                && Objects.equals(toTime, otherEvent.toTime);
     }
 
     @Override
