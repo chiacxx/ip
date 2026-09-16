@@ -150,6 +150,7 @@ public class Echo {
                     Command command = commandParser.parse(input);
                     command.execute(taskManager, ui);
                     if (command.isExit()) {
+                        isExit = true;
                         break;
                     }
                 } catch (EchoException exception) {

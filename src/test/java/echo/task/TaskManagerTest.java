@@ -329,6 +329,38 @@ public class TaskManagerTest {
         assertTrue(deleteException.getMessage().contains("Directive backlog is empty"));
     }
 
+    @Test
+    public void constructors_initializeCorrectly() {
+        TaskManager defaultManager = new TaskManager();
+        assertTrue(defaultManager.isEmpty());
+
+        TaskManager listManager = new TaskManager(new TaskList());
+        assertTrue(listManager.isEmpty());
+    }
+
+    @Test
+    public void sortTasks_byDateSameDate_sortsAlphabetically() throws EchoException {
+        TaskManager manager = createManager();
+        Task beta = manager.addDeadline("beta", "15-10-2026");
+        Task alpha = manager.addDeadline("alpha", "15-10-2026");
+
+        List<Task> sorted = manager.sortTasks(SortCriteria.DATE);
+
+        assertEquals(List.of(alpha, beta), sorted);
+    }
+
+    @Test
+    public void sortTasks_byNameSameDescription_sortsByDateTime() throws EchoException {
+        TaskManager manager = createManager();
+        Task todo = manager.addTodo("project");
+        Task deadlineLate = manager.addDeadline("project", "20-10-2026");
+        Task deadlineEarly = manager.addDeadline("project", "10-10-2026");
+
+        List<Task> sorted = manager.sortTasks(SortCriteria.NAME);
+
+        assertEquals(List.of(deadlineEarly, deadlineLate, todo), sorted);
+    }
+
     /** Creates a manager whose storage file is isolated to the current test. */
     private TaskManager createManager() {
         return new TaskManager(new TaskList(), new Storage(storagePath()));
